@@ -27,6 +27,7 @@ namespace MotionGenerator
             public const string OrganEnergy = "OrganEnergy";
             public const string EatableEnergy = "EatableEnergy";
             public const string ManipulatorEnergyConsumption = "ManipulatorEnergyConsumption";
+            public const string HeightDifferenceInAction = "HeightDifferenceInAction";
             public const string TileAngleEachDirection = "TileAngleEachDirection";
             public const string TileAttribute = "TileAttribute";
             public const string TotalFoodCountEachDirection = "TotalFoodCountEachDirection";

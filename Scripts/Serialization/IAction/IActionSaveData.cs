@@ -12,6 +12,7 @@ namespace MotionGenerator.Serialization
     [Union(7, typeof(StayActionSaveData))]
     [Union(8, typeof(SpinTurnActionSaveData))]
     [Union(9, typeof(RestActionSaveData))]
+    [Union(10, typeof(HopActionSaveData))]
 
     public interface IActionSaveData
     {

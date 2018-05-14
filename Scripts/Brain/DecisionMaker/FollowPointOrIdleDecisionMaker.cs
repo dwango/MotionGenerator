@@ -17,6 +17,7 @@ namespace MotionGenerator
         private IAction _forwardAction;
         private IAction _stayAction;
         private IAction _restAction;
+        private IAction _hopAction;
         private readonly List<IAction> _spinTurnActions = new List<IAction>();
 
         public FollowPointOrIdleDecisionMaker(string stateKeyPrimary, string stateKeySub = null,
@@ -89,12 +90,20 @@ namespace MotionGenerator
                     {
                         _spinTurnActions.Add(action);
                     }
+                    else if (name == "hop")
+                    {
+                        _hopAction = action;
+                    }
                 }
             }
 
             if (_restAction == null)
             {
                 _restAction = _stayAction;
+            }
+            if (_hopAction == null)
+            {
+                _hopAction = _stayAction;
             }
         }
 
@@ -127,6 +136,11 @@ namespace MotionGenerator
             if (rand < 0.10f)
             {
                 return _forwardAction;
+            }
+
+            if (rand < 0.20f)
+            {
+                return _hopAction;
             }
 
             return _restAction;
