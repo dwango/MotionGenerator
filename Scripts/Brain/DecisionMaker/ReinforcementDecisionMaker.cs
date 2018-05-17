@@ -7,6 +7,7 @@ using MotionGenerator.Serialization;
 using SimpleJSON;
 using Debugging;
 using MotionGenerator.Serialization.Algorithm.Reinforcement;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace MotionGenerator
@@ -16,7 +17,6 @@ namespace MotionGenerator
         private readonly KeyValueLogger _rewardLogger;
         private readonly int _historySize;
         private readonly float _discountRatio;
-        protected JsonHttpFetcher Fetcher;
         private float[] _lastRewards = {0, 0};
         private ModelBase _model;
 
@@ -25,14 +25,19 @@ namespace MotionGenerator
 
         private static readonly string[] DefaultKeyOrder =
         {
-            State.BasicKeys.RelativeFoodPosition,
-            State.BasicKeys.RelativeFleshFoodPosition,
-            State.BasicKeys.RelativeTribePosition,
-            State.BasicKeys.RelativeCreaturePosition,
-//            State.BasicKeys.RelativeEnemyPosition,
-            State.BasicKeys.RelativeObjectPosition,
             State.BasicKeys.Position,
-            State.BasicKeys.Forward
+            State.BasicKeys.Forward,
+            State.BasicKeys.RelativeFoodPosition,
+            State.BasicKeys.RelativeCreaturePosition,
+            State.BasicKeys.RelativeTribePosition,
+            State.BasicKeys.RelativeStrangerPosition,
+            State.BasicKeys.RelativeObjectPosition,
+            State.BasicKeys.TotalFoodCountEachDirection,
+            State.BasicKeys.TotalCreatureCountEachDirection,
+            State.BasicKeys.TotalTribeCountEachDirection,
+            State.BasicKeys.TotalStrangerCountEachDirection,
+            State.BasicKeys.TotalObjectCountEachDirection,
+            State.BasicKeys.RelativeObservedTilePosition,
         };
 
         private readonly string[] _keyOrder;
@@ -70,6 +75,26 @@ namespace MotionGenerator
                             }
 
                             return pos;
+                        case State.BasicKeys.TotalFoodCountEachDirection:
+                        case State.BasicKeys.TotalCreatureCountEachDirection:
+                        case State.BasicKeys.TotalTribeCountEachDirection:
+                        case State.BasicKeys.TotalStrangerCountEachDirection:
+                        case State.BasicKeys.TotalObjectCountEachDirection:
+                            var states = state[key].ToSingle();
+                            for (var i = 0; i < states.Count; i++)
+                            {
+                                states[i] /= 100f;
+                                if (states[i] > 1f)
+                                {
+                                    states[i] = 1f;
+                                }
+                                else if (states[i] < 0f)
+                                {
+                                    states[i] = 0f;
+                                }
+                            }
+
+                            return states;
                         default:
                             return state[key].ToSingle();
                     }
