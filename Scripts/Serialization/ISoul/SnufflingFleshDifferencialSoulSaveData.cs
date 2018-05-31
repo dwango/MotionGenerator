@@ -6,7 +6,7 @@ namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
     public sealed class SnufflingFleshDifferencialSoulSaveData : ISoulSaveData,
-        IALifeSerializable<SnufflingFleshDifferencialSoulSaveData>
+        IMotionGeneratorSerializable<SnufflingFleshDifferencialSoulSaveData>
     {
         public ISoul Instantiate()
         {
@@ -16,7 +16,7 @@ namespace MotionGenerator.Serialization
 
     [MessagePackObject]
     public sealed class ModerateSnufflingFleshDifferencialSoulSaveData : ISoulSaveData,
-        IALifeSerializable<ModerateSnufflingFleshDifferencialSoulSaveData>
+        IMotionGeneratorSerializable<ModerateSnufflingFleshDifferencialSoulSaveData>
     {
         public ISoul Instantiate()
         {

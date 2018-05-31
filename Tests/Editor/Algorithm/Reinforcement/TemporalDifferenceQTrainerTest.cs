@@ -17,7 +17,7 @@ namespace MotionGenerator.Tests.Editor.Algorithm.Reinforcement
             );
 
             var saveData = parameter.Save();
-            var copiedSaveData = ALifeSerialization.DeepClone(saveData);
+            var copiedSaveData = MotionGeneratorSerialization.DeepClone(saveData);
 
             Assert.IsNotNull(new TemporalDifferenceQTrainerParameter(saveData));
             var copiedParameter = new TemporalDifferenceQTrainerParameter(copiedSaveData);

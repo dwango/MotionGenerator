@@ -5,7 +5,7 @@ namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
     public sealed class FollowHighestDensityDecisionMakerSaveData : IDecisionMakerSaveData,
-        IALifeSerializable<FollowHighestDensityDecisionMakerSaveData>
+        IMotionGeneratorSerializable<FollowHighestDensityDecisionMakerSaveData>
     {
         [Key(0)]
         public DecisionMakerBaseSaveData DecisionMakerBase { get; set; }

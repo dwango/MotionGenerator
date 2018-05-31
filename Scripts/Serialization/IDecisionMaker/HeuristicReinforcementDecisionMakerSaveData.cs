@@ -5,7 +5,7 @@ namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
     public sealed class HeuristicReinforcementDecisionMakerSaveData : IDecisionMakerSaveData,
-        IALifeSerializable<HeuristicReinforcementDecisionMakerSaveData>
+        IMotionGeneratorSerializable<HeuristicReinforcementDecisionMakerSaveData>
     {
         [Key(0)]
         public ReinforcementDecisionMakerSaveData DecisionMakerBase { get; set; }

@@ -6,7 +6,7 @@ namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
     public sealed class FollowPointDecisionMakerSaveData : IDecisionMakerSaveData,
-        IALifeSerializable<FollowPointDecisionMakerSaveData>
+        IMotionGeneratorSerializable<FollowPointDecisionMakerSaveData>
     {
         [Key(0)]
         public DecisionMakerBaseSaveData DecisionMakerBase { get; set; }

@@ -8,7 +8,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public class TerritorySoulSaveData : ISoulSaveData, IALifeSerializable<TerritorySoulSaveData>
+    public class TerritorySoulSaveData : ISoulSaveData, IMotionGeneratorSerializable<TerritorySoulSaveData>
     {
         [Key(0)] public List<double> TerritoryCenter { get; set; }
 

@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class FixedSequenceMakerSaveData : ISequenceMakerSaveData, IALifeSerializable<FixedSequenceMakerSaveData>
+    public sealed class FixedSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<FixedSequenceMakerSaveData>
     {
         [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public Dictionary<string, List<MotionSequenceSaveData>> MotionDict { get; set; }

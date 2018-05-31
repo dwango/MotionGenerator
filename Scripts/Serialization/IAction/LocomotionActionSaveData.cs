@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class LocomotionActionSaveData : IActionSaveData, IALifeSerializable<LocomotionActionSaveData>
+    public sealed class LocomotionActionSaveData : IActionSaveData, IMotionGeneratorSerializable<LocomotionActionSaveData>
     {
         [Key(0)] public ActionBaseSaveData ActionBase { get; set; }
         [Key(1)] public Vector3 Direction { get; set; }

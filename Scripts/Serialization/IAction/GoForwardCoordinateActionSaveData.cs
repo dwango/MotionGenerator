@@ -4,7 +4,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class GoForwardCoordinateActionSaveData : IActionSaveData, IALifeSerializable<GoForwardCoordinateActionSaveData>
+    public sealed class GoForwardCoordinateActionSaveData : IActionSaveData, IMotionGeneratorSerializable<GoForwardCoordinateActionSaveData>
     {
         [Key(0)] public ActionBaseSaveData ActionBase { get; set; }
 

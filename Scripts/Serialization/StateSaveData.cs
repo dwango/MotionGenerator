@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class StateSaveData : IALifeSerializable<StateSaveData>
+    public sealed class StateSaveData : IMotionGeneratorSerializable<StateSaveData>
     {
         [Key(0)] public Dictionary<string, double[]> Values { get; set; }
 

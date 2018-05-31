@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class RandomSequenceMakerSaveData : ISequenceMakerSaveData, IALifeSerializable<RandomSequenceMakerSaveData>
+    public sealed class RandomSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<RandomSequenceMakerSaveData>
     {
         [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public float TimeRange { get; set; }

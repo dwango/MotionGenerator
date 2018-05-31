@@ -6,7 +6,7 @@ using UnityEngine;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class Candidate3DSaveData : IALifeSerializable<Candidate3DSaveData>
+    public sealed class Candidate3DSaveData : IMotionGeneratorSerializable<Candidate3DSaveData>
     {
         [Key(0)] public Vector3 Mean { get; set; }
         [Key(1)] public int NumTried { get; set; }

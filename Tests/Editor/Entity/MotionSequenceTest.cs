@@ -19,7 +19,7 @@ namespace MotionGenerator
             var b = new MotionTarget(1.0f, new List<float> {0.0f, 2.0f, 4.0f});
 
             var src = new MotionSequence(new List<MotionTarget> {a, b});
-            var dst = new MotionSequence(ALifeSerialization.DeepClone(src.Save()));
+            var dst = new MotionSequence(MotionGeneratorSerialization.DeepClone(src.Save()));
             
             Assert.AreEqual(src.Sequence.Count, dst.Sequence.Count);
             for (int n = 0; n < src.Sequence.Count; ++n)

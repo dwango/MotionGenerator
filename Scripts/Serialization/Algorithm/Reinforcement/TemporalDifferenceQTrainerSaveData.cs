@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization.Algorithm.Reinforcement
 {
     [MessagePackObject]
-    public class ParameterSaveData : IALifeSerializable<ParameterSaveData>
+    public class ParameterSaveData : IMotionGeneratorSerializable<ParameterSaveData>
     {
         [Key(0)]
         public float[] Rewards { get; set; }

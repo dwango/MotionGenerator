@@ -4,7 +4,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class ShootUpwardActionSaveData : IActionSaveData, IALifeSerializable<ShootUpwardActionSaveData>
+    public sealed class ShootUpwardActionSaveData : IActionSaveData, IMotionGeneratorSerializable<ShootUpwardActionSaveData>
     {
         [Key(0)] public ActionBaseSaveData ActionBase { get; set; }
 

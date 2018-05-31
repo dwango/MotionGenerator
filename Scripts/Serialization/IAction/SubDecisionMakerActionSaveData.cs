@@ -4,7 +4,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public class SubDecisionMakerActionSaveData : IActionSaveData, IALifeSerializable<SubDecisionMakerActionSaveData>
+    public class SubDecisionMakerActionSaveData : IActionSaveData, IMotionGeneratorSerializable<SubDecisionMakerActionSaveData>
     {
         [Key(0)] public ActionBaseSaveData ActionBase { get; set; }
         [Key(1)] public IDecisionMakerSaveData DecisionMakerSaveData { get; set; }

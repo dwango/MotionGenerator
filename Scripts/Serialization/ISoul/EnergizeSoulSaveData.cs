@@ -3,7 +3,7 @@ using Serialization;
 
 namespace MotionGenerator.Serialization
 {
-    public class EnergizeSoulSaveData : ISoulSaveData, IALifeSerializable<EnergizeSoulSaveData>
+    public class EnergizeSoulSaveData : ISoulSaveData, IMotionGeneratorSerializable<EnergizeSoulSaveData>
     {
         public ISoul Instantiate()
         {

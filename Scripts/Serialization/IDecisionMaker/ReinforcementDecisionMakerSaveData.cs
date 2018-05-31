@@ -6,7 +6,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class ReinforcementDecisionMakerSaveData : IDecisionMakerSaveData, IALifeSerializable<ReinforcementDecisionMakerSaveData>
+    public sealed class ReinforcementDecisionMakerSaveData : IDecisionMakerSaveData, IMotionGeneratorSerializable<ReinforcementDecisionMakerSaveData>
     {
         [Key(0)] public DecisionMakerBaseSaveData DecisionMakerBase { get; set; }
         [Key(1)] public int HistorySize { get; set; }

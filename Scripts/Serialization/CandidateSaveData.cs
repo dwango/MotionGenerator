@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class CandidateSaveData : IALifeSerializable<CandidateSaveData>
+    public sealed class CandidateSaveData : IMotionGeneratorSerializable<CandidateSaveData>
     {
         [Key(0)] public float Mean { get; set; }
         [Key(1)] public float MeanSquare { get; set; }

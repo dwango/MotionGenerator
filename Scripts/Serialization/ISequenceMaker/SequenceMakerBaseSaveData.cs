@@ -4,7 +4,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class SequenceMakerBaseSaveData : ISequenceMakerSaveData, IALifeSerializable<SequenceMakerBaseSaveData>
+    public sealed class SequenceMakerBaseSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<SequenceMakerBaseSaveData>
     {
         public SequenceMakerBaseSaveData()
         {

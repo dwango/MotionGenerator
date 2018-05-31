@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public class BumpingDifferenceialSoulSaveData : ISoulSaveData, IALifeSerializable<BumpingDifferenceialSoulSaveData>
+    public class BumpingDifferenceialSoulSaveData : ISoulSaveData, IMotionGeneratorSerializable<BumpingDifferenceialSoulSaveData>
     {
         public ISoul Instantiate()
         {
@@ -15,7 +15,7 @@ namespace MotionGenerator.Serialization
 
     [MessagePackObject]
     public class ModerateBumpingDifferenceialSoulSaveData : ISoulSaveData,
-        IALifeSerializable<ModerateBumpingDifferenceialSoulSaveData>
+        IMotionGeneratorSerializable<ModerateBumpingDifferenceialSoulSaveData>
     {
         public ISoul Instantiate()
         {
@@ -25,7 +25,7 @@ namespace MotionGenerator.Serialization
     
     [MessagePackObject]
     public class AvoidObjectSoulSaveData : ISoulSaveData,
-        IALifeSerializable<AvoidObjectSoulSaveData>
+        IMotionGeneratorSerializable<AvoidObjectSoulSaveData>
     {
         public ISoul Instantiate()
         {

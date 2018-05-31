@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class SimpleBanditSequenceMakerSaveData : ISequenceMakerSaveData, IALifeSerializable<SimpleBanditSequenceMakerSaveData>
+    public sealed class SimpleBanditSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<SimpleBanditSequenceMakerSaveData>
     {
         [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public float Epsilon { get; set; }

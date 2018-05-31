@@ -5,7 +5,7 @@ using Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class NostalgiaSoulSaveData : ISoulSaveData, IALifeSerializable<NostalgiaSoulSaveData>
+    public sealed class NostalgiaSoulSaveData : ISoulSaveData, IMotionGeneratorSerializable<NostalgiaSoulSaveData>
     {
         public ISoul Instantiate()
         {
