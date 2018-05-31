@@ -12,6 +12,7 @@ namespace Serialization
         public List<Type> GetAllSerializableTypes()
         {
             return Assembly.GetAssembly(typeof(MotionGeneratorSerialization)).GetTypes()
+                .Where(t => t.Namespace.Contains("MotionGenerator"))
                 .Where(x => x.GetCustomAttributes(typeof(MessagePackObjectAttribute), true).Length > 0)
                 .ToList();
         }
