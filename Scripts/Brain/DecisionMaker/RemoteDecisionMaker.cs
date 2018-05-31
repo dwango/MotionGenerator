@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using MiniJSON;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MotionGenerator.Serialization;
+using UnityEngine;
 
 namespace MotionGenerator
 {
@@ -54,7 +54,7 @@ namespace MotionGenerator
             base.Init(actions);
             Fetcher.Post(
                 "init",
-                Json.Serialize(
+                JsonUtility.ToJson(
                     actions.Select(action => new Dictionary<string, string>() {{"name", action.Name}}).ToList())
             );
             DecideAction(_defaultValues);
@@ -81,7 +81,7 @@ namespace MotionGenerator
                 // デシリアライズ時に Fetcher の IP / Port がわからないので Init できない
                 Fetcher.Post(
                     "load",
-                    Json.Serialize(new Dictionary<string, string>
+                    JsonUtility.ToJson(new Dictionary<string, string>
                     {
                         {"id", value}
                     })
@@ -92,7 +92,8 @@ namespace MotionGenerator
         public override IAction DecideAction(State state)
         {
             var targetKeys = _defaultValues.Keys;
-            var tmpState = new State(state.Where(v => targetKeys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value));
+            var tmpState =
+                new State(state.Where(v => targetKeys.Contains(v.Key)).ToDictionary(v => v.Key, v => v.Value));
             foreach (var kv in _defaultValues)
             {
                 if (!tmpState.ContainsKey(kv.Key))
@@ -100,9 +101,10 @@ namespace MotionGenerator
                     tmpState[kv.Key] = kv.Value;
                 }
             }
+
             var actionString = Fetcher.Post(
                 "decideAction",
-                Json.Serialize(tmpState)
+                JsonUtility.ToJson(tmpState)
             );
             var actionName = SimpleJSON.JSON.Parse(actionString)["name"];
             return Actions.First(action => action.Name.Equals(actionName));
@@ -112,7 +114,7 @@ namespace MotionGenerator
         {
             Fetcher.Post(
                 "feedback",
-                Json.Serialize(reward)
+                JsonUtility.ToJson(reward)
             );
         }
     }

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using chainer;
-using Debugging;
 using MathNet.Numerics.LinearAlgebra;
 using MotionGenerator.Serialization.Algorithm.Reinforcement;
-using ObservationArea.Public.Exceptions;
 using UnityEngine.Assertions;
 
 namespace MotionGenerator.Algorithm.Reinforcement
@@ -54,7 +52,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
         private float[] _rewardWeights;
 
         public float[] LastDecisionWeightsForViewer { get; private set; }
-        private readonly KeyValueLogger _qValueLogger;
+//        private readonly KeyValueLogger _qValueLogger;
 
         private readonly System.Random _random = new System.Random();
 
@@ -78,7 +76,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
             _actionDimention = actionDimention;
             _replaySize = replaySize;
             _rewardWeights = rewardWeights;
-            _qValueLogger = new KeyValueLogger(GetType().Name, key: "qvalues", id: GetHashCode().ToString());
+//            _qValueLogger = new KeyValueLogger(GetType().Name, key: "qvalues", id: GetHashCode().ToString());
             LastDecisionWeightsForViewer = rewardWeights.Select(_ => 0f).ToArray();
             switch (optimizerType)
             {
@@ -89,7 +87,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
                     _optimizer = new chainer.optimizers.SGD(lr: alpha);
                     break;
                 default:
-                    throw new ALSimulatorException("no such optimizer");
+                    throw new Exception("no such optimizer");
             }
 
             _optimizer.Setup(qNetwork);
@@ -113,11 +111,11 @@ namespace MotionGenerator.Algorithm.Reinforcement
             var qValueVector = qValue.Value.Clone().Row(0);
             qValue.VolatilizeWithoutBackward();
 
-            if (_qValueLogger.Enabled())
-            {
-                _qValueLogger.Debug("state:" + string.Join(",", state.Row(0).Select(x => x.ToString()).ToArray()));
-                _qValueLogger.Debug(string.Join(",", qValueVector.Select(x => x.ToString()).ToArray()));
-            }
+//            if (_qValueLogger.Enabled())
+//            {
+//                _qValueLogger.Debug("state:" + string.Join(",", state.Row(0).Select(x => x.ToString()).ToArray()));
+//                _qValueLogger.Debug(string.Join(",", qValueVector.Select(x => x.ToString()).ToArray()));
+//            }
 
             var mergedValue = Enumerable.Repeat(0f, _actionDimention).ToArray();
             for (int i_reward = 0; i_reward < _rewardWeights.Length; i_reward++)
@@ -233,39 +231,14 @@ namespace MotionGenerator.Algorithm.Reinforcement
                     var prediction = predictedReward.Value[0, parameter.Action + i_soul * _actionDimention];
                     // 目標値 - 予測値 = 修正誤差
                     var rawDifference = targetPrediction - prediction;
-                    if (_qValueLogger.Enabled())
-                    {
-                        _qValueLogger.Debug("diff:" + rawDifference + "/reward" + reward);
-                    }
+//                    if (_qValueLogger.Enabled())
+//                    {
+//                        _qValueLogger.Debug("diff:" + rawDifference + "/reward" + reward);
+//                    }
 
                     // lossのためのdummy値なので、性格で重み付けする
                     dummyTargetValue[0, parameter.Action + i_soul * _actionDimention] =
                         prediction + rawDifference * _rewardWeights[i_soul];
-                }
-
-                if (Debugging.DebugConfig.GetOrElse("debugShow", false))
-                {
-                    var random = new System.Random();
-                    if (random.Next(1000) == (GetHashCode() % 1000))
-                    {
-                        UnityEngine.Debug.Log("train");
-                        for (int i_soul = 0; i_soul < parameter.Rewards.Length; i_soul++)
-                        {
-                            UnityEngine.Debug.Log(String.Format("{0} reward {1}", GetHashCode(),
-                                parameter.Rewards[i_soul]));
-                            UnityEngine.Debug.Log(String.Format(
-                                "predict({0}) {1} * {2} = {3}", GetHashCode(),
-                                predictedReward.Value[0, parameter.Action + i_soul * _actionDimention],
-                                _rewardWeights[i_soul],
-                                predictedReward.Value[0, parameter.Action + i_soul * _actionDimention] *
-                                _rewardWeights[i_soul]
-                            ));
-                            UnityEngine.Debug.Log(String.Format(
-                                "({0}) {1} <- {2}", GetHashCode(),
-                                dummyTargetValue[0, parameter.Action + i_soul * _actionDimention],
-                                predictedReward.Value[0, parameter.Action + i_soul * _actionDimention]));
-                        }
-                    }
                 }
 
                 loss = loss + chainer.functions.MeanSquaredError.ForwardStatic(

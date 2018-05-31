@@ -5,7 +5,6 @@ using MotionGenerator.Algorithm.Reinforcement;
 using MotionGenerator.Algorithm.Reinforcement.Models;
 using MotionGenerator.Serialization;
 using SimpleJSON;
-using Debugging;
 using MotionGenerator.Serialization.Algorithm.Reinforcement;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -14,7 +13,7 @@ namespace MotionGenerator
 {
     public class ReinforcementDecisionMaker : DecisionMakerBase
     {
-        private readonly KeyValueLogger _rewardLogger;
+//        private readonly KeyValueLogger _rewardLogger;
         private readonly int _historySize;
         private readonly float _discountRatio;
         private float[] _lastRewards = {0, 0};
@@ -108,7 +107,7 @@ namespace MotionGenerator
             float[] soulWeights = null, string optimizerType = "adam", int hiddenDimention = 32,
             string[] keyOrder = null, float optimizerAlpha = 0.01f)
         {
-            _rewardLogger = new KeyValueLogger(GetType().Name, key: "reward", id: GetHashCode().ToString());
+//            _rewardLogger = new KeyValueLogger(GetType().Name, key: "reward", id: GetHashCode().ToString());
             _historySize = historySize;
             _discountRatio = discountRatio;
             _soulWeights = soulWeights == null ? new float[] {1f} : soulWeights.ToArray();
@@ -129,7 +128,7 @@ namespace MotionGenerator
         public ReinforcementDecisionMaker(ReinforcementDecisionMakerSaveData saveData)
             : base(saveData.DecisionMakerBase)
         {
-            _rewardLogger = new KeyValueLogger(GetType().Name, key: "reward", id: GetHashCode().ToString());
+//            _rewardLogger = new KeyValueLogger(GetType().Name, key: "reward", id: GetHashCode().ToString());
             _historySize = saveData.HistorySize;
             _discountRatio = saveData.DiscountRatio;
             _lastRewards = saveData.LastRewards;
@@ -297,10 +296,10 @@ namespace MotionGenerator
                                 state.ContainsKey(State.BasicKeys.AvoidLearning) &&
                                 (state.GetAsFloat(State.BasicKeys.AvoidLearning) > 0.0001f);
 
-            if (_rewardLogger.Enabled() && !avoidLearning)
-            {
-                _rewardLogger.Log(string.Join(",", _lastRewards.Select(x => x.ToString()).ToArray()));
-            }
+//            if (_rewardLogger.Enabled() && !avoidLearning)
+//            {
+//                _rewardLogger.Log(string.Join(",", _lastRewards.Select(x => x.ToString()).ToArray()));
+//            }
 
             var index = _trainer.Predict(stateMarix, _lastRewards, forceRandom, forceMax, forceAction, avoidLearning);
 

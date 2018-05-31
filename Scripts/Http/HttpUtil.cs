@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net;
 using System.Text;
-using MiniJSON;
+using UnityEngine;
 
 namespace MotionGenerator
 {
@@ -38,7 +38,7 @@ namespace MotionGenerator
 
         public string Post(string endpoint)
         {
-            return Post(endpoint, Json.Serialize(""));
+            return Post(endpoint, JsonUtility.ToJson(""));
         }
     }
 }
