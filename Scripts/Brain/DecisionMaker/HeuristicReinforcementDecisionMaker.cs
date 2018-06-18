@@ -95,9 +95,9 @@ namespace MotionGenerator
 
             var action = ForceAction(state, _practiceDecisionMakerIndex);
 
-            if (action != null && action.Name != "stay")
+            if (action != null && action is LocomotionAction)
             {
-                // StayActionはカウント外
+                // LocomotionAction以外はカウント外
                 _practiceDecisionCount--;
             }
 
