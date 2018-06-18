@@ -97,7 +97,6 @@ namespace MotionGenerator
 
             if (action != null && action is LocomotionAction)
             {
-                // LocomotionAction以外はカウント外
                 _practiceDecisionCount--;
             }
 
