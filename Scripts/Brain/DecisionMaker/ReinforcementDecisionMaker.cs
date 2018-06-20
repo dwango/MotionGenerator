@@ -47,6 +47,7 @@ namespace MotionGenerator
         private readonly int _hiddenDimention;
         protected Dictionary<int, IDecisionMaker> SubDecisionMakers = new Dictionary<int, IDecisionMaker>();
         private List<ParameterSaveData> _historySaveData;
+        private float _randomActionProbability; 
 
         public bool ForDebugEnableAvoidTraining = true; // falseにすると全てのActionを学習対象にする
 
@@ -114,6 +115,7 @@ namespace MotionGenerator
             _optimizerType = optimizerType;
             _hiddenDimention = hiddenDimention;
             _optimizerAlpha = optimizerAlpha;
+            _randomActionProbability = 0.1f;
             if (keyOrder != null)
             {
                 _keyOrder = keyOrder.ToArray();
@@ -139,6 +141,7 @@ namespace MotionGenerator
             _keyOrder = saveData.KeyOrder;
             _optimizerAlpha = saveData.OptimizerAlpha;
             _historySaveData = saveData.HistorySaveData;
+            _randomActionProbability = saveData.RandomActionProbability;
 
             SubDecisionMakers = new Dictionary<int, IDecisionMaker>();
             for (int i = 0; i < saveData.SubDecisionMakersKeys.Length; i++)
@@ -182,12 +185,14 @@ namespace MotionGenerator
                 _optimizerAlpha,
                 _trainer != null
                     ? _trainer.GetHistorySaveData()
-                    : new List<ParameterSaveData>() //FIXME(kogaki) trainerのライフサイクル設計
+                    : new List<ParameterSaveData>(), //FIXME(kogaki) trainerのライフサイクル設計
+                _randomActionProbability
             );
         }
 
         private void LoadInitialModel(int inputDimention = 6)
         {
+            _model = null;
             ResetTrainer(inputDimention: inputDimention);
 //            if (Actions.Count == 8 && inputDimention == 6)
 //            {
@@ -204,7 +209,7 @@ namespace MotionGenerator
             _inputDimention = inputDimention;
             _model = model;
             _trainer = new MotionGenerator.Algorithm.Reinforcement.TemporalDifferenceQTrainer(
-                epsilon: 0.1f, qNetwork: _model,
+                epsilon: _randomActionProbability, qNetwork: _model,
                 historySize: _historySize, discountRatio: _discountRatio, actionDimention: Actions.Count,
                 replaySize: 32, alpha: _optimizerAlpha, rewardWeights: _soulWeights, optimizerType: _optimizerType,
                 initialHistory: _historySaveData != null
@@ -276,6 +281,17 @@ namespace MotionGenerator
         public override void AlterSoulWeights(float[] soulWeights)
         {
             _trainer.AlterRewardWeights(soulWeights);
+        }
+
+        public override void SetRandomActionProbability(float probability)
+        {
+            _randomActionProbability = probability;
+            _trainer.SetEpsilon(_randomActionProbability);
+        }
+
+        public override void ResetTrainer()
+        {
+            LoadInitialModel();
         }
 
         protected IAction ForceAction(State state, int actionIndex)

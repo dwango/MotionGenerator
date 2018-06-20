@@ -11,6 +11,8 @@ namespace MotionGenerator
         IAction DecideAction(State state);
         void Feedback(List<float> reward);
         void AlterSoulWeights(float[] soulWeights);
+        void SetRandomActionProbability(float probability);
+        void ResetTrainer();
         IDecisionMakerSaveData Save();
     }
 }

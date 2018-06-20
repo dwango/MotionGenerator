@@ -43,7 +43,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
 
     public class TemporalDifferenceQTrainer
     {
-        private readonly double _epsilon;
+        private float _epsilon;
         private readonly Chain _qNetwork;
         private readonly int _historySize;
         private readonly int _replaySize;
@@ -64,7 +64,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
 
         private readonly chainer.optimizers.Optimizer _optimizer;
 
-        public TemporalDifferenceQTrainer(double epsilon, Chain qNetwork, int historySize, float discountRatio,
+        public TemporalDifferenceQTrainer(float epsilon, Chain qNetwork, int historySize, float discountRatio,
             int actionDimention, int replaySize, float[] rewardWeights, float alpha = 0.001f,
             string optimizerType = "adam", List<TemporalDifferenceQTrainerParameter> initialHistory = null)
         {
@@ -94,7 +94,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
             _history = initialHistory ?? new List<TemporalDifferenceQTrainerParameter>();
         }
 
-        public TemporalDifferenceQTrainer(double epsilon, Chain qNetwork, int historySize, float discountRatio,
+        public TemporalDifferenceQTrainer(float epsilon, Chain qNetwork, int historySize, float discountRatio,
             int actionDimention, float[] rewardWeights) : this(epsilon, qNetwork, historySize, discountRatio,
             actionDimention, rewardWeights: rewardWeights, replaySize: historySize)
         {
@@ -192,6 +192,12 @@ namespace MotionGenerator.Algorithm.Reinforcement
         {
             Assert.AreEqual(rewardWeights.Length, _rewardWeights.Length);
             rewardWeights.CopyTo(_rewardWeights, 0);
+        }
+
+        public void SetEpsilon(float epsilon)
+        {
+            Assert.IsTrue(0f <= epsilon && epsilon <= 1f, epsilon.ToString());
+            _epsilon = epsilon;
         }
 
         /// <summary>

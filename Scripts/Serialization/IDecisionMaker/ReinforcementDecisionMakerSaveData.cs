@@ -22,6 +22,7 @@ namespace MotionGenerator.Serialization
         [Key(11)] public string[] KeyOrder { get; set; }
         [Key(12)] public float OptimizerAlpha { get; set; }
         [Key(13)] public List<ParameterSaveData> HistorySaveData { get; set; }
+        [Key(14)] public float RandomActionProbability { get; set; }
 
         public ReinforcementDecisionMakerSaveData()
         {
@@ -32,7 +33,8 @@ namespace MotionGenerator.Serialization
             float discountRatio, float[] lastRewards, string modelSaveDataJson, int inputDimention, float[] soulWeights,
             string optimizerType, int hiddenDimention, int[] subDecisionMakersKeys,
             IDecisionMakerSaveData[] subDecisionMakerValues,
-            string[] keyOrder, float optimizerAlpha, List<ParameterSaveData> historySaveData)
+            string[] keyOrder, float optimizerAlpha, List<ParameterSaveData> historySaveData,
+            float randomActionProbability)
         {
             OptimizerAlpha = optimizerAlpha;
             HistorySaveData = historySaveData;
@@ -48,6 +50,7 @@ namespace MotionGenerator.Serialization
             SubDecisionMakersKeys = subDecisionMakersKeys;
             SubDecisionMakerValues = subDecisionMakerValues;
             KeyOrder = keyOrder;
+            RandomActionProbability = randomActionProbability;
         }
 
         public IDecisionMaker Instantiate()

@@ -99,5 +99,15 @@ namespace MotionGenerator
             _currentAction = _decisionMaker.DecideAction(state);
             return _sequenceMaker.GenerateSequence(_currentAction);
         }
+        
+        public void SetRandomActionProbability(float probability)
+        {
+            _decisionMaker.SetRandomActionProbability( probability);
+        }
+
+        public void ResetTrainer()
+        {
+            _decisionMaker.ResetTrainer();
+        }
     }
 }

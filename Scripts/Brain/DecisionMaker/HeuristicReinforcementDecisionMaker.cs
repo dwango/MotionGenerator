@@ -9,6 +9,7 @@ namespace MotionGenerator
     {
         private int _practiceDecisionMakerIndex;
         private int _practiceDecisionCount;
+        private int _practiceDecisionInitialCount;
 
         private int _emergencyDecisionMakerIndex;
         private float _emergencyEnergyRatio;
@@ -20,7 +21,7 @@ namespace MotionGenerator
             : base(historySize, discountRatio, soulWeights, optimizerType, hiddenDimention)
         {
             _practiceDecisionMakerIndex = practiceDecisionMakerIndex;
-            _practiceDecisionCount = practiceDecisionCount;
+            _practiceDecisionCount = _practiceDecisionInitialCount = practiceDecisionCount;
             _emergencyDecisionMakerIndex = emergencyDecisionMakerIndex;
             _emergencyEnergyRatio = emergencyEnergyRatio;
         }
@@ -31,6 +32,7 @@ namespace MotionGenerator
         {
             _practiceDecisionMakerIndex = saveData.PracticeDecisionMakerIndex;
             _practiceDecisionCount = saveData.PracticeDecisionCount;
+            _practiceDecisionInitialCount = saveData.PracticeDecisionInitialCount;
             _emergencyDecisionMakerIndex = saveData.EmergencyDecisionMakerIndex;
             _emergencyEnergyRatio = saveData.EmergencyEnergyRatio;
         }
@@ -40,6 +42,7 @@ namespace MotionGenerator
             return new HeuristicReinforcementDecisionMakerSaveData((ReinforcementDecisionMakerSaveData) base.Save(),
                 _practiceDecisionMakerIndex,
                 _practiceDecisionCount,
+                _practiceDecisionInitialCount,
                 _emergencyDecisionMakerIndex,
                 _emergencyEnergyRatio
             );
@@ -76,7 +79,12 @@ namespace MotionGenerator
             return base.DecideAction(state);
         }
 
-
+        public override void ResetTrainer()
+        {
+            _practiceDecisionCount = _practiceDecisionInitialCount; // カウンタを最初に戻す
+            base.ResetTrainer();
+        }
+        
         private void InitPracticeMotion(List<IAction> actions)
         {
             if (_practiceDecisionMakerIndex < 0)

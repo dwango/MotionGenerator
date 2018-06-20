@@ -24,6 +24,14 @@ namespace MotionGenerator
             // soulを必要としないDMには何も効果がない
         }
 
+        public virtual void SetRandomActionProbability(float probability)
+        {
+        }
+
+        public virtual void ResetTrainer()
+        {
+        }
+        
         public virtual IDecisionMakerSaveData Save()
         {
             return new DecisionMakerBaseSaveData(
@@ -58,5 +66,6 @@ namespace MotionGenerator
         public virtual void Feedback(List<float> reward)
         {
         }
+       
     }
 }

@@ -22,17 +22,21 @@ namespace MotionGenerator.Serialization
         [Key(4)]
         public float EmergencyEnergyRatio { get; set; }
 
+        [Key(5)]
+        public int PracticeDecisionInitialCount { get; set; }
+        
         public HeuristicReinforcementDecisionMakerSaveData()
         {
         }
 
         public HeuristicReinforcementDecisionMakerSaveData(ReinforcementDecisionMakerSaveData decisionMakerBase,
-            int practiceDecisionMakerIndex, int practiceDecisionCount,
+            int practiceDecisionMakerIndex, int practiceDecisionCount, int practiceDecisionInitialCount,
             int emergencyDecisionMakerIndex, float emergencyEnergyRatio)
         {
             DecisionMakerBase = decisionMakerBase;
             PracticeDecisionMakerIndex = practiceDecisionMakerIndex;
             PracticeDecisionCount = practiceDecisionCount;
+            PracticeDecisionInitialCount = practiceDecisionInitialCount;
             EmergencyDecisionMakerIndex = emergencyDecisionMakerIndex;
             EmergencyEnergyRatio = emergencyEnergyRatio;
         }
