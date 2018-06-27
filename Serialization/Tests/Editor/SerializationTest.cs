@@ -5,7 +5,7 @@ using System.Reflection;
 using MessagePack;
 using NUnit.Framework;
 
-namespace Serialization
+namespace MotionGenerator.Serialization
 {
     public partial class SerializationTest
     {

@@ -1,7 +1,7 @@
 ﻿using MathNet.Numerics.Distributions;
 using MotionGenerator.Algorithm.Reinforcement;
 using NUnit.Framework;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Tests.Editor.Algorithm.Reinforcement
 {

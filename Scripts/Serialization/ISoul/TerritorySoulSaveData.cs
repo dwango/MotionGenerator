@@ -3,7 +3,7 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MessagePack;
 using MotionGenerator.Entity.Soul;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {

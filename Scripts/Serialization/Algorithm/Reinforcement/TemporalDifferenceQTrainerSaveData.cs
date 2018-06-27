@@ -1,6 +1,6 @@
 ﻿using MessagePack;
 using MotionGenerator.Algorithm.Reinforcement;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization.Algorithm.Reinforcement
 {

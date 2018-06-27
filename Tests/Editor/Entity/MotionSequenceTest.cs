@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using NUnit.Framework;
-using Serialization;
+using MotionGenerator.Serialization;
 using UnityEngine;
 
 

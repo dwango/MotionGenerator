@@ -3,7 +3,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using MotionGenerator.Algorithm.Reinforcement;
 using MotionGenerator.Tests;
 using NUnit.Framework;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {

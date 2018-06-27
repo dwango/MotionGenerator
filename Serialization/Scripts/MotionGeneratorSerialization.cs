@@ -1,6 +1,6 @@
 using MessagePack;
 
-namespace Serialization
+namespace MotionGenerator.Serialization
 {
     public static class MotionGeneratorSerialization
     {

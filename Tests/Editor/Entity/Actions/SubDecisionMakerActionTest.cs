@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {

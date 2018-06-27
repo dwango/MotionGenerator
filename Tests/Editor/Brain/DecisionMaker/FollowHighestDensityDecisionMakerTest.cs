@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra.Double;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {

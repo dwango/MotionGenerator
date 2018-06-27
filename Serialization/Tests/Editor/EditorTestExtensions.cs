@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Serialization
+namespace MotionGenerator.Serialization
 {
     public static class EditorTestExtensions
     {

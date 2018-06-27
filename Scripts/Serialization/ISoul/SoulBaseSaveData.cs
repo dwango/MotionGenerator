@@ -1,6 +1,6 @@
 using MessagePack;
 using MotionGenerator.Entity.Soul;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {

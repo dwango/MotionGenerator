@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using MessagePack;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {

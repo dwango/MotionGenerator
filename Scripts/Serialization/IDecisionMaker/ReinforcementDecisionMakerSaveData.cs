@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MessagePack;
 using MotionGenerator.Serialization.Algorithm.Reinforcement;
-using Serialization;
+using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {
