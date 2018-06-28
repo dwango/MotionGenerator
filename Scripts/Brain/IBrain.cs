@@ -11,7 +11,7 @@ namespace MotionGenerator
         void Restore(List<int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul);
         void AlterSoulWeights(float[] soulWeights);
         void SetRandomActionProbability(float probability);
-        void ResetTrainer();
+        void ResetModel();
         List<MotionSequence> GenerateMotionSequence(State state);
         IBrainSaveData Save();
     }

@@ -105,7 +105,7 @@ namespace MotionGenerator
             _decisionMaker.SetRandomActionProbability( probability);
         }
 
-        public void ResetTrainer()
+        public void ResetModel()
         {
             _decisionMaker.ResetModel();
         }
