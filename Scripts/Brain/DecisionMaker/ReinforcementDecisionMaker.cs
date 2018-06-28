@@ -47,7 +47,7 @@ namespace MotionGenerator
         private readonly int _hiddenDimention;
         protected Dictionary<int, IDecisionMaker> SubDecisionMakers = new Dictionary<int, IDecisionMaker>();
         private List<ParameterSaveData> _historySaveData;
-        private float _randomActionProbability; 
+        private float _randomActionProbability;
 
         public bool ForDebugEnableAvoidTraining = true; // falseにすると全てのActionを学習対象にする
 
@@ -153,7 +153,8 @@ namespace MotionGenerator
             var modelSaveDataJson = saveData.ModelSaveDataJson;
             if (modelSaveDataJson != null)
             {
-                LoadInitialModel(_inputDimention);
+                CreateModel();
+                CreateTrainer(_inputDimention);
                 var deserializer = new chainer.serializers.JsonDeserializer(JSON.Parse(modelSaveDataJson));
                 _model.Serialize(deserializer);
             }
@@ -192,9 +193,10 @@ namespace MotionGenerator
 
         private void LoadInitialModel(int inputDimention = 6)
         {
-            _model = null;
-            ResetTrainer(inputDimention: inputDimention);
-//            if (Actions.Count == 8 && inputDimention == 6)
+            _inputDimention = inputDimention;
+            CreateModel();
+            CreateTrainer(inputDimention);
+//            if (Actions.Count == 8 && _inputDimention == 6)
 //            {
 //                var textAsset = Resources.Load("initial_weight_4layers") as TextAsset;
 //                var json = SimpleJSON.JSON.Parse(textAsset.text);
@@ -204,39 +206,41 @@ namespace MotionGenerator
         }
 
 
-        private void ResetTrainer(int inputDimention, ModelBase model)
+        private void CreateModel()
         {
-            _inputDimention = inputDimention;
-            _model = model;
+            _model = new Simple4LayerSigmoid(inputDimention: _inputDimention,
+                outputDimention: Actions.Count * _soulWeights.Length, hiddenDimention: _hiddenDimention);
+        }
+
+
+        private void CreateTrainer(int inputDimention)
+        {
+            if (_inputDimention != inputDimention)
+            {
+                _inputDimention = inputDimention;
+                _model.AlterInputDimention(inputDimention);
+            }
+
             _trainer = new MotionGenerator.Algorithm.Reinforcement.TemporalDifferenceQTrainer(
                 epsilon: _randomActionProbability, qNetwork: _model,
                 historySize: _historySize, discountRatio: _discountRatio, actionDimention: Actions.Count,
                 replaySize: 32, alpha: _optimizerAlpha, rewardWeights: _soulWeights, optimizerType: _optimizerType,
                 initialHistory: _historySaveData != null
                     ? _historySaveData.Select(x => x.Instantiate()).ToList()
-                    : new List<TemporalDifferenceQTrainerParameter>());
+                    : null
+            );
+
             _historySaveData = null; //FIXME(kogaki): _historySaveDataをインスタンス変数に持たないようにしたい
-        }
-
-        private void ResetTrainer(int inputDimention)
-        {
-            if (_model == null)
-            {
-                _model = new Simple4LayerSigmoid(inputDimention: inputDimention,
-                    outputDimention: Actions.Count * _soulWeights.Length, hiddenDimention: _hiddenDimention);
-            }
-            else
-            {
-                _model.AlterInputDimention(inputDimention);
-            }
-
-            ResetTrainer(inputDimention, _model);
         }
 
         public override void Init(List<IAction> actions)
         {
             base.Init(actions);
-            LoadInitialModel();
+
+            if (_model == null)
+            {
+                LoadInitialModel();
+            }
 
             // Instantiate subDMs
             var nonDecisionMakerActions = actions.Where(x => !(x is SubDecisionMakerAction)).ToList();
@@ -257,7 +261,9 @@ namespace MotionGenerator
         {
             var parentDecisionMaker = (ReinforcementDecisionMaker) parent;
             Init(parentDecisionMaker.Actions);
-            ResetTrainer(parentDecisionMaker._inputDimention);
+
+            _historySaveData = parentDecisionMaker._trainer.GetHistorySaveData();
+            CreateTrainer(parentDecisionMaker._inputDimention);
 
             var serializer = new chainer.serializers.DictionarySerializer();
             parentDecisionMaker._model.Serialize(serializer);
@@ -289,9 +295,10 @@ namespace MotionGenerator
             _trainer.SetEpsilon(_randomActionProbability);
         }
 
-        public override void ResetTrainer()
+        public override void ResetModel()
         {
-            LoadInitialModel();
+            CreateModel();
+            CreateTrainer(_inputDimention);
         }
 
         protected IAction ForceAction(State state, int actionIndex)
@@ -305,7 +312,7 @@ namespace MotionGenerator
             var stateMarix = State2Matrix(state);
             if (stateMarix.ColumnCount != _inputDimention)
             {
-                ResetTrainer(stateMarix.ColumnCount);
+                CreateTrainer(stateMarix.ColumnCount);
             }
 
             var avoidLearning = ForDebugEnableAvoidTraining &&

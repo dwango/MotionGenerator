@@ -12,7 +12,7 @@ namespace MotionGenerator
         void Feedback(List<float> reward);
         void AlterSoulWeights(float[] soulWeights);
         void SetRandomActionProbability(float probability);
-        void ResetTrainer();
+        void ResetModel();
         IDecisionMakerSaveData Save();
     }
 }

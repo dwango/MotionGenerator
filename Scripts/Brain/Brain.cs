@@ -107,7 +107,7 @@ namespace MotionGenerator
 
         public void ResetTrainer()
         {
-            _decisionMaker.ResetTrainer();
+            _decisionMaker.ResetModel();
         }
     }
 }

@@ -79,10 +79,10 @@ namespace MotionGenerator
             return base.DecideAction(state);
         }
 
-        public override void ResetTrainer()
+        public override void ResetModel()
         {
             _practiceDecisionCount = _practiceDecisionInitialCount; // カウンタを最初に戻す
-            base.ResetTrainer();
+            base.ResetModel();
         }
         
         private void InitPracticeMotion(List<IAction> actions)

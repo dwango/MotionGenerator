@@ -28,7 +28,7 @@ namespace MotionGenerator
         {
         }
 
-        public virtual void ResetTrainer()
+        public virtual void ResetModel()
         {
         }
         
