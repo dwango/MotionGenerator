@@ -262,7 +262,6 @@ namespace MotionGenerator
             var parentDecisionMaker = (ReinforcementDecisionMaker) parent;
             Init(parentDecisionMaker.Actions);
 
-            _historySaveData = parentDecisionMaker._trainer.GetHistorySaveData();
             CreateTrainer(parentDecisionMaker._inputDimention);
 
             var serializer = new chainer.serializers.DictionarySerializer();
