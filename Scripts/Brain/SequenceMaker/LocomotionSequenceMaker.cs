@@ -307,16 +307,16 @@ namespace MotionGenerator
             {
                 var lastPosition = lastState.GetAsVector3(State.BasicKeys.Position);
                 var lastRotation = lastState.GetAsQuaternion(State.BasicKeys.Rotation);
-                var lastTime = (float) lastState[State.BasicKeys.Time][0];
-                var currentTime = (float) currentState[State.BasicKeys.Time][0];
+                var lastTime = lastState.GetAsDouble(State.BasicKeys.Time);
+                var currentTime = currentState.GetAsDouble(State.BasicKeys.Time);
 
                 var currentPosition = currentState.GetAsVector3(State.BasicKeys.Position);
                 var currentRotation = currentState.GetAsQuaternion(State.BasicKeys.Rotation);
 
                 var movement = Quaternion.Inverse(lastRotation) * (currentPosition - lastPosition) /
-                               (currentTime - lastTime);
+                               (float) (currentTime - lastTime);
                 var rotation = Mathf.DeltaAngle(lastRotation.eulerAngles.y, currentRotation.eulerAngles.y)
-                               / (currentTime - lastTime);
+                               / (float) (currentTime - lastTime);
                 _lastOutput.Update(movement, rotation);
                 Maintain(_lastAction);
             }

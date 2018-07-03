@@ -41,9 +41,9 @@ namespace MotionGenerator
 
         protected static float GetActionTime(State lastState, State nowState)
         {
-            var lastTime = lastState.GetAsFloat(State.BasicKeys.Time);
-            var currentTime = nowState.GetAsFloat(State.BasicKeys.Time);
-            return currentTime - lastTime;
+            var lastTime = lastState.GetAsDouble(State.BasicKeys.Time);
+            var currentTime = nowState.GetAsDouble(State.BasicKeys.Time);
+            return (float) (currentTime - lastTime);
         }
 
         protected static float GetManipulatorEnergyConsumption(State nowState)

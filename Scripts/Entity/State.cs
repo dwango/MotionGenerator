@@ -72,6 +72,7 @@ namespace MotionGenerator
             {
                 dict.Add(kv.Key, kv.Value.ToArray());
             }
+
             return new StateSaveData(
                 dict
             );
@@ -88,7 +89,7 @@ namespace MotionGenerator
         public Vector3 GetAsVector3(string key)
         {
             var p = this[key];
-            return new Vector3((float)p[0], (float)p[1], (float)p[2]);
+            return new Vector3((float) p[0], (float) p[1], (float) p[2]);
         }
 
         public void Set(string key, Quaternion q)
@@ -103,22 +104,27 @@ namespace MotionGenerator
         public Quaternion GetAsQuaternion(string key)
         {
             var p = this[key];
-            return new Quaternion((float)p[0], (float)p[1], (float)p[2], (float)p[3]);
+            return new Quaternion((float) p[0], (float) p[1], (float) p[2], (float) p[3]);
         }
 
-        public void Set(string key, float f)
+        public void Set(string key, double d)
         {
             var p = this[key];
             var count = p.Count;
             for (var i = 0; i < count; i++)
             {
-                p[i] = f;
+                p[i] = d;
             }
         }
 
         public float GetAsFloat(string key)
         {
-            return (float)this[key][0];
+            return (float) this[key][0];
+        }
+
+        public double GetAsDouble(string key)
+        {
+            return this[key][0];
         }
 
         public void FillZero()
@@ -173,7 +179,8 @@ namespace MotionGenerator
                         delCount++;
                     }
                 }
-                for(var i = 0;i < delCount;i++)
+
+                for (var i = 0; i < delCount; i++)
                 {
                     Remove(delKeys[i]);
                 }
