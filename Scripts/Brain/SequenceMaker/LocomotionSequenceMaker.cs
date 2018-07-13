@@ -448,8 +448,8 @@ namespace MotionGenerator
                     return;
                 }
 
-                var similar = _randomMaker.GenerateSimilarSequence(action, _lastOutput.Value, 0.3f * _epsilon, false);
-                var duration = similar.Select(motionSequence => motionSequence.Sequence.Last().time).Max();
+                List<MotionSequence> similar = _randomMaker.GenerateSimilarSequence(action, _lastOutput.Value, 0.3f * _epsilon, false);
+                var duration = similar.Select(motionSequence => motionSequence.GetDuration()).Max();
 
                 // Action継続時間を可変にし、Evolutionaryで時間スケールの伸縮
                 var maxScaleFactor = 1.2f;

@@ -68,5 +68,10 @@ namespace MotionGenerator
                 return Sequence [i];
             }
         }
+
+        public float GetDuration()
+        {
+            return Sequence.Last().time;
+        }
     }
 }
