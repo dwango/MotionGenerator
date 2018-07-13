@@ -26,6 +26,7 @@ namespace MotionGenerator
             ISequenceMaker fallbackSequenceMaker, bool enableTurn = false) : base(epsilon, minimumCandidates, timeScale,
             fallbackSequenceMaker, enableTurn)
         {
+            MaxCandidates = 500;
         }
 
         public void SetCandidates(List<Candidate3D> candidates)

@@ -24,7 +24,7 @@ namespace MotionGenerator
         private int _manipulatableDimension;
         private bool _lastDidFallbacked;
 
-        private const int maxCandidates = 128; // 保持するモーションの最大数
+        protected int MaxCandidates = 128; // 保持するモーションの最大数
         private const float predictionTime = 2.5f; // 角度を見積もる時間幅
         private const int NumTriedCutoffThreshold = 5; // 得意な方向を見つけるときに、偶然に移動距離が大きいモーションを除外するための試行回数の足切り
         private const int MinimumDurationFrame = 30; // これ以上短い動作は作らない
@@ -436,19 +436,20 @@ namespace MotionGenerator
         {
             if (_maintainRandom.Sample() < 0.3f * _epsilon)
             {
-                if (Candidates.Count >= maxCandidates)
+                if (Candidates.Count >= MaxCandidates)
                 {
                     Candidates = DeleteBadMotions(Candidates);
                 }
 
-                if (Candidates.Count >= maxCandidates)
+                if (Candidates.Count >= MaxCandidates)
                 {
                     Debug.LogWarning(
                         "DeleteBadMotionsでモーションが消されてない。DeleteBadMotionsの基準を厳しくして、よりモーションが削除されるようにしたほうがいい");
                     return;
                 }
 
-                List<MotionSequence> similar = _randomMaker.GenerateSimilarSequence(action, _lastOutput.Value, 0.3f * _epsilon, false);
+                List<MotionSequence> similar =
+                    _randomMaker.GenerateSimilarSequence(action, _lastOutput.Value, 0.3f * _epsilon, false);
                 var duration = similar.Select(motionSequence => motionSequence.GetDuration()).Max();
 
                 // Action継続時間を可変にし、Evolutionaryで時間スケールの伸縮
@@ -459,6 +460,18 @@ namespace MotionGenerator
                 var scaleFactor = Mathf.Exp((float) _randomGenerator.NextDouble() *
                                             (logMaxScaleFactor - logMinScaleFactor) + logMinScaleFactor);
                 similar = _randomMaker.ChangeTimeScale(action, scaleFactor, similar);
+                if (duration <= MinimumDurationFrame)
+                {
+                    for (int i = 0; i < 100; i++) // whileにしたいけど、無限ループ防止
+                    {
+                        if (similar.Select(motionSequence => motionSequence.GetDuration()).Max() > MinimumDurationFrame)
+                        {
+                            break;
+                        }
+
+                        similar = _randomMaker.ChangeTimeScale(action, scaleFactor, similar);
+                    }
+                }
 
                 Candidates.Add(new Candidate3D(similar));
             }
