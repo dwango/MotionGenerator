@@ -20,17 +20,12 @@ namespace MotionGenerator
 
         protected MersenneTwister RandomGenerator = new MersenneTwister(0);
 
-        public SimpleBanditSequenceMaker(float epsilon, int minimumCandidates, int numControlPoints,
-            int maxSequenceLength)
+        public SimpleBanditSequenceMaker(float epsilon, int minimumCandidates, int numControlPoints = 3,
+            int maxSequenceLength = 100)
         {
             _epsilon = epsilon;
             _minimumCandidates = minimumCandidates;
             _numControlPoints = numControlPoints;
-        }
-
-        public SimpleBanditSequenceMaker(float epsilon, int minimumCandidates)
-            : this(epsilon, minimumCandidates, 4, 100)
-        {
         }
 
         public SimpleBanditSequenceMaker(SimpleBanditSequenceMakerSaveData saveData)
@@ -83,7 +78,12 @@ namespace MotionGenerator
             foreach (var action in actions)
             {
                 var rsm = new RandomSequenceMaker(MaxSequenceLength, 1.0f, _numControlPoints);
+                rsm.Init(actions, manipulationDimensions);
                 _randomMakerDict.Add(action.Name, rsm);
+                _candidatesDict.Add(action.Name, new List<Candidate>()
+                {
+                    new Candidate(rsm.GenerateSequence(action))
+                });
             }
         }
 
