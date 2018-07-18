@@ -17,8 +17,10 @@ namespace MotionGenerator
         public HeuristicReinforcementDecisionMaker(int historySize = 100000, float discountRatio = 0.9f,
             float[] soulWeights = null, string optimizerType = "adam", int hiddenDimention = 32,
             int practiceDecisionMakerIndex = -1, int practiceDecisionCount = 256,
-            int emergencyDecisionMakerIndex = -1, float emergencyEnergyRatio = 0.1f)
-            : base(historySize, discountRatio, soulWeights, optimizerType, hiddenDimention)
+            int emergencyDecisionMakerIndex = -1, float emergencyEnergyRatio = 0.1f,
+            bool enableRandomForgetting = false)
+            : base(historySize, discountRatio, soulWeights, optimizerType, hiddenDimention, 
+                enableRandomForgetting : enableRandomForgetting)
         {
             _practiceDecisionMakerIndex = practiceDecisionMakerIndex;
             _practiceDecisionCount = _practiceDecisionInitialCount = practiceDecisionCount;

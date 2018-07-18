@@ -21,6 +21,7 @@ namespace MotionGenerator
 
         private readonly float[] _soulWeights;
         private readonly float _optimizerAlpha;
+        private readonly bool _enableRandomForgetting;
 
         private static readonly string[] DefaultKeyOrder =
         {
@@ -106,7 +107,7 @@ namespace MotionGenerator
 
         public ReinforcementDecisionMaker(int historySize = 100000, float discountRatio = 0.9f,
             float[] soulWeights = null, string optimizerType = "adam", int hiddenDimention = 32,
-            string[] keyOrder = null, float optimizerAlpha = 0.01f)
+            string[] keyOrder = null, float optimizerAlpha = 0.01f, bool enableRandomForgetting = false)
         {
 //            _rewardLogger = new KeyValueLogger(GetType().Name, key: "reward", id: GetHashCode().ToString());
             _historySize = historySize;
@@ -115,6 +116,8 @@ namespace MotionGenerator
             _optimizerType = optimizerType;
             _hiddenDimention = hiddenDimention;
             _optimizerAlpha = optimizerAlpha;
+            _enableRandomForgetting = enableRandomForgetting;
+            
             _randomActionProbability = 0.1f;
             if (keyOrder != null)
             {
@@ -142,6 +145,7 @@ namespace MotionGenerator
             _optimizerAlpha = saveData.OptimizerAlpha;
             _historySaveData = saveData.HistorySaveData;
             _randomActionProbability = saveData.RandomActionProbability;
+            _enableRandomForgetting = saveData.EnableRandomForgetting;
 
             SubDecisionMakers = new Dictionary<int, IDecisionMaker>();
             for (int i = 0; i < saveData.SubDecisionMakersKeys.Length; i++)
@@ -187,7 +191,8 @@ namespace MotionGenerator
                 _trainer != null
                     ? _trainer.GetHistorySaveData()
                     : new List<ParameterSaveData>(), //FIXME(kogaki) trainerのライフサイクル設計
-                _randomActionProbability
+                _randomActionProbability,
+                _enableRandomForgetting
             );
         }
 
@@ -225,6 +230,7 @@ namespace MotionGenerator
                 epsilon: _randomActionProbability, qNetwork: _model,
                 historySize: _historySize, discountRatio: _discountRatio, actionDimention: Actions.Count,
                 replaySize: 32, alpha: _optimizerAlpha, rewardWeights: _soulWeights, optimizerType: _optimizerType,
+                enableRandomForgetting: _enableRandomForgetting,
                 initialHistory: _historySaveData != null
                     ? _historySaveData.Select(x => x.Instantiate()).ToList()
                     : null

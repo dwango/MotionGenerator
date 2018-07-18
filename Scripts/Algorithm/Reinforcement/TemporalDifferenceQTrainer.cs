@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using chainer;
 using MathNet.Numerics.LinearAlgebra;
@@ -50,6 +51,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
         private readonly float _discountRatio;
         private readonly int _actionDimention;
         private float[] _rewardWeights;
+        private bool _enableRandomForgetting;
 
         public float[] LastDecisionWeightsForViewer { get; private set; }
 //        private readonly KeyValueLogger _qValueLogger;
@@ -66,7 +68,8 @@ namespace MotionGenerator.Algorithm.Reinforcement
 
         public TemporalDifferenceQTrainer(float epsilon, Chain qNetwork, int historySize, float discountRatio,
             int actionDimention, int replaySize, float[] rewardWeights, float alpha = 0.001f,
-            string optimizerType = "adam", List<TemporalDifferenceQTrainerParameter> initialHistory = null)
+            string optimizerType = "adam", List<TemporalDifferenceQTrainerParameter> initialHistory = null,
+            bool enableRandomForgetting = false)
         {
             _epsilon = epsilon;
             _qNetwork = qNetwork;
@@ -76,6 +79,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
             _actionDimention = actionDimention;
             _replaySize = replaySize;
             _rewardWeights = rewardWeights;
+            _enableRandomForgetting = enableRandomForgetting;
 //            _qValueLogger = new KeyValueLogger(GetType().Name, key: "qvalues", id: GetHashCode().ToString());
             LastDecisionWeightsForViewer = rewardWeights.Select(_ => 0f).ToArray();
             switch (optimizerType)
@@ -180,7 +184,7 @@ namespace MotionGenerator.Algorithm.Reinforcement
 
             while (_history.Count > _historySize)
             {
-                _history.RemoveAt(0);
+                _history.RemoveAt(_enableRandomForgetting ? _random.Next(_history.Count) : 0);
             }
 
             _lastAction = action;
