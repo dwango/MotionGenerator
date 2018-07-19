@@ -27,7 +27,7 @@ namespace MotionGenerator
         protected int MaxCandidates = 128; // 保持するモーションの最大数
         private const float predictionTime = 2.5f; // 角度を見積もる時間幅
         private const int NumTriedCutoffThreshold = 5; // 得意な方向を見つけるときに、偶然に移動距離が大きいモーションを除外するための試行回数の足切り
-        private const int MinimumDurationFrame = 30; // これ以上短い動作は作らない
+        private const int MinimumDurationFrame = 15; // これ以上短い動作は作らない
         private readonly bool _enableTurn;
 
         private class ImportantCandidates
