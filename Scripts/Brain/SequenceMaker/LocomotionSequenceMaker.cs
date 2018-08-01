@@ -29,6 +29,8 @@ namespace MotionGenerator
         private const int NumTriedCutoffThreshold = 5; // 得意な方向を見つけるときに、偶然に移動距離が大きいモーションを除外するための試行回数の足切り
         private const int MinimumDurationFrame = 15; // これ以上短い動作は作らない
         private readonly bool _enableTurn;
+        private float _consumptionEnergyCoef;
+        private float _consumptionEnergyPenaltyWeight;
 
         private class ImportantCandidates
         {
@@ -42,7 +44,8 @@ namespace MotionGenerator
         /// <param name="timeScale"></param>
         /// <param name="fallbackSequenceMaker">方向以外のActionを扱うようのMotionMaker</param>
         public LocomotionSequenceMaker(float epsilon, int minimumCandidates, float timeScale,
-            ISequenceMaker fallbackSequenceMaker, bool enableTurn = false)
+            ISequenceMaker fallbackSequenceMaker, bool enableTurn = false,
+            float consumptionEnergyCoef = 0f, float consumptionEnergyPenaltyWeight = 0f)
         {
             _epsilon = epsilon;
             _minimumCandidates = minimumCandidates;
@@ -51,6 +54,8 @@ namespace MotionGenerator
             _lastAction = LocomotionAction.GoStraight("");
             _lastOutput = new Candidate3D(new List<MotionSequence>());
             _enableTurn = enableTurn;
+            _consumptionEnergyCoef = consumptionEnergyCoef;
+            _consumptionEnergyPenaltyWeight = consumptionEnergyPenaltyWeight;
         }
 
         public LocomotionSequenceMaker(LocomotionSequenceMakerSaveData saveData)
@@ -67,6 +72,8 @@ namespace MotionGenerator
             _fallbackSequenceMaker = saveData.FallbackSequenceMaker.Instantiate();
             _manipulatableDimension = saveData.ManipulatableDimension;
             _enableTurn = saveData.EnableTurn;
+            _consumptionEnergyCoef = saveData.ConsumptionEnergyCoef;
+            _consumptionEnergyPenaltyWeight = saveData.ConsumptionEnergyPenaltyWeight;
         }
 
         public new LocomotionSequenceMakerSaveData Save()
@@ -85,13 +92,20 @@ namespace MotionGenerator
                 _randomMaker.Save(),
                 _fallbackSequenceMaker.SaveAsInterface(),
                 _manipulatableDimension,
-                _enableTurn
+                _enableTurn,
+                _consumptionEnergyCoef,
+                _consumptionEnergyPenaltyWeight
             );
         }
 
         public override ISequenceMakerSaveData SaveAsInterface()
         {
             return Save();
+        }
+
+        public void SetConsumptionEnergyCoef(float consumptionEnergyCoef)
+        {
+            _consumptionEnergyCoef = consumptionEnergyCoef;
         }
 
         public override void Init(List<IAction> actions, List<int> manipulationDimensions)
@@ -307,6 +321,30 @@ namespace MotionGenerator
             }
         }
 
+        private float HeuristicPenalty(State currentState, float timeSpan)
+        {
+            var penalty = 1f;
+
+            // 消費エネルギーのペナルティ
+            if (_consumptionEnergyCoef > 0f && _consumptionEnergyPenaltyWeight > 0f)
+            {
+                var consumptionEnergy =
+                    currentState.GetAsFloat(State.BasicKeys.AverageManipulatorEnergyConsumption)
+                    * _consumptionEnergyCoef / timeSpan;
+
+                penalty = 1f - _consumptionEnergyPenaltyWeight
+                          + _consumptionEnergyPenaltyWeight * (1f - consumptionEnergy);
+
+                if (penalty < 0f)
+                {
+//                    Debug.LogWarning("消費エネルギーが多い:" + consumptionEnergy);
+                    penalty = 0f;
+                }
+            }
+
+            return penalty;
+        }
+
         public override void Feedback(float reward, State lastState, State currentState)
         {
             if (!_lastDidFallbacked)
@@ -314,16 +352,20 @@ namespace MotionGenerator
                 var lastPosition = lastState.GetAsVector3(State.BasicKeys.Position);
                 var lastRotation = lastState.GetAsQuaternion(State.BasicKeys.Rotation);
                 var lastTime = lastState.GetAsDouble(State.BasicKeys.Time);
-                var currentTime = currentState.GetAsDouble(State.BasicKeys.Time);
 
                 var currentPosition = currentState.GetAsVector3(State.BasicKeys.Position);
                 var currentRotation = currentState.GetAsQuaternion(State.BasicKeys.Rotation);
+                var currentTime = currentState.GetAsDouble(State.BasicKeys.Time);
 
-                var movement = Quaternion.Inverse(lastRotation) * (currentPosition - lastPosition) /
-                               (float) (currentTime - lastTime);
+                var timeSpan = (float) (currentTime - lastTime);
+                var movement = Quaternion.Inverse(lastRotation) * (currentPosition - lastPosition)
+                               / timeSpan;
                 var rotation = Mathf.DeltaAngle(lastRotation.eulerAngles.y, currentRotation.eulerAngles.y)
-                               / (float) (currentTime - lastTime);
-                _lastOutput.Update(movement, rotation);
+                               / timeSpan;
+
+                var value = movement * HeuristicPenalty(currentState, timeSpan);
+
+                _lastOutput.Update(value, rotation);
                 Maintain(_lastAction);
             }
             else
@@ -361,7 +403,7 @@ namespace MotionGenerator
                 var candidate = candidates[i];
 
                 float eulerAnglesY;
-                if (candidate.Mean.magnitude == 0)
+                if (candidate.Mean == Vector3.zero)
                 {
                     eulerAnglesY = 0;
                 }
@@ -370,8 +412,7 @@ namespace MotionGenerator
                     eulerAnglesY = Quaternion.LookRotation(candidate.Mean).eulerAngles.y;
                 }
 
-                const float deltaAngleY = 360f / divisionNum / 2f; // 各方向を中心に等分割を簡単に計算するために座標を回転させる量
-                var directionId = (int) Mathf.Floor((eulerAnglesY + deltaAngleY) / (360f / divisionNum)) % divisionNum;
+                var directionId = ((int) (eulerAnglesY * (divisionNum * 2) / 360f) + 1) / 2 % divisionNum;
                 distancesByDir[directionId].Add(i, Vector3.Dot(candidate.Mean, unitDirections[directionId]));
                 angularVelocitiesByDir[directionId].Add(i, candidate.AxisYAngularVelocity);
                 deleteFlag[i] = true;

@@ -44,7 +44,7 @@ namespace MotionGenerator
             var rotatedAngle = GetRotatedAngle(lastState, nowState);
             var movedDistance = GetMovedDistance(lastState, nowState);
             var actionTime = GetActionTime(lastState, nowState);
-            var manipulatorEnergyConsumption = GetManipulatorEnergyConsumption(nowState);
+            var manipulatorEnergyConsumption = GetAverageManipulatorEnergyConsumption(nowState);
 
             return -(Mathf.Abs(rotatedAngle) / 180f + movedDistance) / actionTime * manipulatorEnergyConsumption;
         }

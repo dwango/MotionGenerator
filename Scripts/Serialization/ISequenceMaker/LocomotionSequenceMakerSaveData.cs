@@ -19,6 +19,9 @@ namespace MotionGenerator.Serialization
         [Key(9)] public ISequenceMakerSaveData FallbackSequenceMaker { get; set; }
         [Key(10)] public int ManipulatableDimension { get; set; }
         [Key(11)] public bool EnableTurn { get; set; }
+        [Key(12)] public float ConsumptionEnergyCoef { get; set; }
+        [Key(13)] public float ConsumptionEnergyPenaltyWeight { get; set; }
+        
 
         public LocomotionSequenceMakerSaveData()
         {
@@ -29,7 +32,8 @@ namespace MotionGenerator.Serialization
             int minimumCandidates, float timeScale, List<LocomotionActionSaveData> locomotionActions,
             IActionSaveData lastAction, Candidate3DSaveData lastOutput, List<Candidate3DSaveData> candidates,
             RandomSequenceMakerSaveData randomMaker, ISequenceMakerSaveData fallbackSequenceMaker,
-            int manipulatableDimension, bool enableTurn)
+            int manipulatableDimension, bool enableTurn,
+            float consumptionEnergyCoef, float consumptionEnergyPenaltyWeight)
         {
             SequenceMakerBase = sequenceMakerBase;
             Epsilon = epsilon;
@@ -43,6 +47,8 @@ namespace MotionGenerator.Serialization
             FallbackSequenceMaker = fallbackSequenceMaker;
             ManipulatableDimension = manipulatableDimension;
             EnableTurn = enableTurn;
+            ConsumptionEnergyCoef = consumptionEnergyCoef;
+            ConsumptionEnergyPenaltyWeight = consumptionEnergyPenaltyWeight;
         }
 
         public LocomotionSequenceMaker Instantiate()

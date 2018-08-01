@@ -50,5 +50,10 @@ namespace MotionGenerator
         {
             return (float) nowState[State.BasicKeys.ManipulatorEnergyConsumption][0];
         }
+
+        protected static float GetAverageManipulatorEnergyConsumption(State nowState)
+        {
+            return (float) nowState[State.BasicKeys.AverageManipulatorEnergyConsumption][0];
+        }
     }
 }
