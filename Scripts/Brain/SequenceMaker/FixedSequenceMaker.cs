@@ -44,7 +44,7 @@ namespace MotionGenerator
                 kv => kv.Value);
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action)
+        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             return _motionDict[action.Name];
         }

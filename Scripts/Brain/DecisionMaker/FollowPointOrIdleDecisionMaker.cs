@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.LinearAlgebra.Double;
 using MotionGenerator.Serialization;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -12,6 +13,7 @@ namespace MotionGenerator
         private readonly System.Random _random = new System.Random();
         private bool _isNegative;
         private float _stayableDistance;
+        private float _nearbyDistance;
 
         private List<IAction> _locomotionActions;
         private IAction _forwardAction;
@@ -21,7 +23,7 @@ namespace MotionGenerator
         private readonly List<IAction> _spinTurnActions = new List<IAction>();
 
         public FollowPointOrIdleDecisionMaker(string stateKeyPrimary, string stateKeySub = null,
-            string stateKeySub2 = null, bool isNegative = false, float stayableDistance = 0f)
+            string stateKeySub2 = null, bool isNegative = false, float stayableDistance = 0f, float nearbyDistance = 0f)
         {
             _stateKeys.Add(stateKeyPrimary);
             if (stateKeySub != null)
@@ -36,6 +38,7 @@ namespace MotionGenerator
 
             _isNegative = isNegative;
             _stayableDistance = stayableDistance;
+            _nearbyDistance = nearbyDistance;
         }
 
         public FollowPointOrIdleDecisionMaker(FollowPointOrIdleDecisionMakerSaveData saveData)
@@ -44,6 +47,7 @@ namespace MotionGenerator
             _stateKeys = saveData.StateKeys;
             _isNegative = saveData.IsNegative;
             _stayableDistance = saveData.StayableDistance;
+            _nearbyDistance = saveData.NearbyDistance;
         }
 
         public override IDecisionMakerSaveData Save()
@@ -52,7 +56,8 @@ namespace MotionGenerator
                 (DecisionMakerBaseSaveData) base.Save(),
                 _stateKeys,
                 _isNegative,
-                _stayableDistance
+                _stayableDistance,
+                _nearbyDistance
             );
         }
 
@@ -149,7 +154,9 @@ namespace MotionGenerator
         public override IAction DecideAction(State state)
         {
             var direction = _locomotionActions.Count;
-            var stayableRatio = _stayableDistance / state.GetAsFloat(State.BasicKeys.SightRange);
+            var sightRange = state.GetAsFloat(State.BasicKeys.SightRange);
+            var stayableRatio = _stayableDistance / sightRange;
+            var nearbyRatio = _nearbyDistance / sightRange;
 
             for (var i = 0; i < _stateKeys.Count; i++)
             {
@@ -162,6 +169,17 @@ namespace MotionGenerator
                     if (magnitude <= stayableRatio)
                     {
                         return _stayAction;
+                    }
+
+                    // ターゲットに近くなってきたらSequenceMakerに歩きモーションを要求
+                    if (magnitude <= nearbyRatio)
+                    {
+                        if (state.ContainsKey(State.BasicKeys.WalkMotion) == false)
+                        {
+                            state[State.BasicKeys.WalkMotion] = new DenseVector(1);
+                        }
+                        
+                        state.Set(State.BasicKeys.WalkMotion, 1);
                     }
 
                     var angle = Quaternion.LookRotation(target).eulerAngles.y + (_isNegative ? 180f : 0);

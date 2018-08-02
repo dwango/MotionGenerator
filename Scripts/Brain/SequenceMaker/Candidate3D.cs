@@ -7,9 +7,9 @@ namespace MotionGenerator
 {
     public class Candidate3D
     {
-        public Vector3 Mean;
-        public float AxisYAngularVelocity;
-        public int NumTried;
+        public Vector3 Mean { get; private set; }
+        public float AxisYAngularVelocity { get; private set; }
+        public int NumTried { get; private set; }
 
         // TODO(nakamura): これだと中身の変更ができるので、System.Collections.ObjectModel.ReadOnlyDictionaryに変える
         public List<MotionSequence> Value { get; private set; }

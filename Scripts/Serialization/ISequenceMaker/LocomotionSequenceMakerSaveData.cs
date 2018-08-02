@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using MessagePack;
-using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {
@@ -12,7 +11,7 @@ namespace MotionGenerator.Serialization
         [Key(2)] public int MinimumCandidates { get; set; }
         [Key(3)] public float TimeScale { get; set; }
         [Key(4)] public List<LocomotionActionSaveData> LocomotionActions { get; set; }
-        [Key(5)] public IActionSaveData LastAction { get; set; }
+//        [Key(5)] public IActionSaveData LastAction { get; set; }
         [Key(6)] public Candidate3DSaveData LastOutput { get; set; }
         [Key(7)] public List<Candidate3DSaveData> Candidates { get; set; }
         [Key(8)] public RandomSequenceMakerSaveData RandomMaker { get; set; }
@@ -21,6 +20,11 @@ namespace MotionGenerator.Serialization
         [Key(11)] public bool EnableTurn { get; set; }
         [Key(12)] public float ConsumptionEnergyCoef { get; set; }
         [Key(13)] public float ConsumptionEnergyPenaltyWeight { get; set; }
+        [Key(14)] public LocomotionSequenceMaker.CandidatesType LastCandidatesType { get; set; }
+        [Key(15)] public List<Candidate3DSaveData> CandidatesHigher { get; set; }
+        [Key(16)] public List<Candidate3DSaveData> CandidatesLower { get; set; }
+        [Key(17)] public List<Candidate3DSaveData> CandidatesWalking { get; set; }
+        [Key(18)] public float WalkingStep { get; set; }
         
 
         public LocomotionSequenceMakerSaveData()
@@ -30,25 +34,31 @@ namespace MotionGenerator.Serialization
 
         public LocomotionSequenceMakerSaveData(SequenceMakerBaseSaveData sequenceMakerBase, float epsilon,
             int minimumCandidates, float timeScale, List<LocomotionActionSaveData> locomotionActions,
-            IActionSaveData lastAction, Candidate3DSaveData lastOutput, List<Candidate3DSaveData> candidates,
+            Candidate3DSaveData lastOutput, LocomotionSequenceMaker.CandidatesType lastCandidatesType,
+            List<Candidate3DSaveData> candidates, List<Candidate3DSaveData> candidatesHigher,
+            List<Candidate3DSaveData> candidatesLower,  List<Candidate3DSaveData> candidatesWalking,
             RandomSequenceMakerSaveData randomMaker, ISequenceMakerSaveData fallbackSequenceMaker,
             int manipulatableDimension, bool enableTurn,
-            float consumptionEnergyCoef, float consumptionEnergyPenaltyWeight)
+            float consumptionEnergyCoef, float consumptionEnergyPenaltyWeight, float walkingStep)
         {
             SequenceMakerBase = sequenceMakerBase;
             Epsilon = epsilon;
             MinimumCandidates = minimumCandidates;
             TimeScale = timeScale;
             LocomotionActions = locomotionActions;
-            LastAction = lastAction;
             LastOutput = lastOutput;
+            LastCandidatesType = lastCandidatesType;
             Candidates = candidates;
+            CandidatesHigher = candidatesHigher;
+            CandidatesLower = candidatesLower;
+            CandidatesWalking = candidatesWalking;
             RandomMaker = randomMaker;
             FallbackSequenceMaker = fallbackSequenceMaker;
             ManipulatableDimension = manipulatableDimension;
             EnableTurn = enableTurn;
             ConsumptionEnergyCoef = consumptionEnergyCoef;
             ConsumptionEnergyPenaltyWeight = consumptionEnergyPenaltyWeight;
+            WalkingStep = walkingStep;
         }
 
         public LocomotionSequenceMaker Instantiate()

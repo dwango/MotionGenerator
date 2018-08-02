@@ -97,7 +97,7 @@ namespace MotionGenerator
             }
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action)
+        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             var candidates = _candidatesDict[action.Name];
             var epsilonUniform = new ContinuousUniform(0, 1.0, RandomGenerator);

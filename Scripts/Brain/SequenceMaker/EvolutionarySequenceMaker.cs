@@ -113,7 +113,7 @@ namespace MotionGenerator
             Init(_actions, manipulationDimensions);
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action)
+        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             var candidates = _candidatesDict[action.Name];
             _lastOutput = SelectByExpect(candidates);

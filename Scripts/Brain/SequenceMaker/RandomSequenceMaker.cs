@@ -70,7 +70,7 @@ namespace MotionGenerator
             this.Init(actions, manipulatableDimensions);
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action)
+        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             return _outputDimentions.Select(x => GenerateSynchronousSingleSequence(action, x)).ToList();
         }

@@ -55,7 +55,7 @@ namespace MotionGenerator
             return false;
         }
 
-        public abstract List<MotionSequence> GenerateSequence(IAction action);
+        public abstract List<MotionSequence> GenerateSequence(IAction action, State currentState = null);
 
         public virtual void Feedback(float reward, State lastState, State currentState)
         {

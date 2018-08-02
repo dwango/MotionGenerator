@@ -44,6 +44,7 @@ namespace MotionGenerator
             public const string TotalStrangerCountEachDirection = "TotalStrangerCountEachDirection";
             public const string TotalStrangerEnergyEachDirection = "TotalStrangerEnergyEachDirection";
             public const string RelativeObservedTilePosition = "RelativeObservedTilePosition";
+            public const string WalkMotion = "WalkMotion";
             public const string AvoidLearning = "AvoidLearning"; // なにかのセンサーの状態が大きく変わって，学習をやめたい時 > 0
         }
 

@@ -10,7 +10,7 @@ namespace MotionGenerator
         void AlterManipulatables(List<int> manipulationDimensions);
         bool NeedToAlterManipulatables(List<int> manipulationDimensions);
         void Restore(List<IAction> actions, List<int> manipulatableDimensions);
-        List<MotionSequence> GenerateSequence(IAction action);
+        List<MotionSequence> GenerateSequence(IAction action, State currentState);
         void Feedback(float reward, State lastState, State currentState);
         ISequenceMakerSaveData SaveAsInterface();
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Random;
@@ -10,14 +11,25 @@ namespace MotionGenerator
 {
     public class LocomotionSequenceMaker : SequenceMakerBase
     {
+        public enum CandidatesType
+        {
+            Horizontal,
+            Higher,
+            Lower,
+            Walking
+        }
+
         private float _epsilon; //epsilon-greedy
         private int _minimumCandidates;
         private readonly float _timeScale;
         private List<LocomotionAction> _locomotionActions;
         private List<IAction> _actions;
-        private IAction _lastAction;
         private Candidate3D _lastOutput;
-        protected List<Candidate3D> Candidates;
+        private CandidatesType _lastCandidatesType = CandidatesType.Horizontal;
+
+        private readonly Dictionary<CandidatesType, List<Candidate3D>> _candidates =
+            new Dictionary<CandidatesType, List<Candidate3D>>();
+
         private RandomSequenceMaker _randomMaker;
         private readonly ISequenceMaker _fallbackSequenceMaker;
         private MersenneTwister _randomGenerator;
@@ -25,14 +37,14 @@ namespace MotionGenerator
         private bool _lastDidFallbacked;
 
         protected int MaxCandidates = 128; // 保持するモーションの最大数
-        private const float predictionTime = 2.5f; // 角度を見積もる時間幅
+        private const float PredictionTime = 2.5f; // 角度を見積もる時間幅
         private const int NumTriedCutoffThreshold = 5; // 得意な方向を見つけるときに、偶然に移動距離が大きいモーションを除外するための試行回数の足切り
-        private const int MinimumDurationFrame = 15; // これ以上短い動作は作らない
         private readonly bool _enableTurn;
         private float _consumptionEnergyCoef;
         private float _consumptionEnergyPenaltyWeight;
+        private float _walkingStep;
 
-        private class ImportantCandidates
+        private struct ImportantCandidates
         {
             public Candidate3D MaxMagunitudeCandidate;
             public Candidate3D MaxDirectionalMagunitudeCandidate;
@@ -45,17 +57,18 @@ namespace MotionGenerator
         /// <param name="fallbackSequenceMaker">方向以外のActionを扱うようのMotionMaker</param>
         public LocomotionSequenceMaker(float epsilon, int minimumCandidates, float timeScale,
             ISequenceMaker fallbackSequenceMaker, bool enableTurn = false,
-            float consumptionEnergyCoef = 0f, float consumptionEnergyPenaltyWeight = 0f)
+            float consumptionEnergyCoef = 0f, float consumptionEnergyPenaltyWeight = 0f,
+            float walkingStep = 0f)
         {
             _epsilon = epsilon;
             _minimumCandidates = minimumCandidates;
             _timeScale = timeScale;
             _fallbackSequenceMaker = fallbackSequenceMaker;
-            _lastAction = LocomotionAction.GoStraight("");
             _lastOutput = new Candidate3D(new List<MotionSequence>());
             _enableTurn = enableTurn;
             _consumptionEnergyCoef = consumptionEnergyCoef;
             _consumptionEnergyPenaltyWeight = consumptionEnergyPenaltyWeight;
+            _walkingStep = walkingStep;
         }
 
         public LocomotionSequenceMaker(LocomotionSequenceMakerSaveData saveData)
@@ -65,15 +78,27 @@ namespace MotionGenerator
             _minimumCandidates = saveData.MinimumCandidates;
             _timeScale = saveData.TimeScale;
             _locomotionActions = saveData.LocomotionActions.Select(x => x.InstantiateLocomotionAction()).ToList();
-            _lastAction = saveData.LastAction.Instantiate();
             _lastOutput = new Candidate3D(saveData.LastOutput);
-            Candidates = saveData.Candidates.Select(x => new Candidate3D(x)).ToList();
+            _lastCandidatesType = saveData.LastCandidatesType;
+
+            _candidates[CandidatesType.Horizontal] = saveData.Candidates.Select(x => new Candidate3D(x)).ToList();
+            _candidates[CandidatesType.Higher] = saveData.CandidatesHigher == null
+                ? new List<Candidate3D>(_minimumCandidates)
+                : saveData.CandidatesHigher.Select(x => new Candidate3D(x)).ToList();
+            _candidates[CandidatesType.Lower] = saveData.CandidatesLower == null
+                ? new List<Candidate3D>(_minimumCandidates)
+                : saveData.CandidatesLower.Select(x => new Candidate3D(x)).ToList();
+            _candidates[CandidatesType.Walking] = saveData.CandidatesWalking == null
+                ? new List<Candidate3D>(_minimumCandidates)
+                : saveData.CandidatesWalking.Select(x => new Candidate3D(x)).ToList();
+
             _randomMaker = saveData.RandomMaker.Instantiate();
             _fallbackSequenceMaker = saveData.FallbackSequenceMaker.Instantiate();
             _manipulatableDimension = saveData.ManipulatableDimension;
             _enableTurn = saveData.EnableTurn;
             _consumptionEnergyCoef = saveData.ConsumptionEnergyCoef;
             _consumptionEnergyPenaltyWeight = saveData.ConsumptionEnergyPenaltyWeight;
+            _walkingStep = saveData.WalkingStep;
         }
 
         public new LocomotionSequenceMakerSaveData Save()
@@ -86,15 +111,19 @@ namespace MotionGenerator
                 _minimumCandidates,
                 _timeScale,
                 _locomotionActions.Select(x => x.Save()).ToList(),
-                _lastAction.SaveAsInterface(),
                 _lastOutput.Save(),
-                Candidates.Select(x => x.Save()).ToList(),
+                _lastCandidatesType,
+                _candidates[CandidatesType.Horizontal].Select(x => x.Save()).ToList(),
+                _candidates[CandidatesType.Higher].Select(x => x.Save()).ToList(),
+                _candidates[CandidatesType.Lower].Select(x => x.Save()).ToList(),
+                _candidates[CandidatesType.Walking].Select(x => x.Save()).ToList(),
                 _randomMaker.Save(),
                 _fallbackSequenceMaker.SaveAsInterface(),
                 _manipulatableDimension,
                 _enableTurn,
                 _consumptionEnergyCoef,
-                _consumptionEnergyPenaltyWeight
+                _consumptionEnergyPenaltyWeight,
+                _walkingStep
             );
         }
 
@@ -124,10 +153,16 @@ namespace MotionGenerator
 
             _randomMaker = new RandomSequenceMaker(MaxSequenceLength * _timeScale, 1, 3);
             _randomMaker.Init(new List<IAction> {actions[0]}, manipulationDimensions);
-            Candidates = new List<Candidate3D>(_minimumCandidates);
-            for (var i = 0; i < Candidates.Capacity; i++)
+
+            foreach (CandidatesType t in Enum.GetValues(typeof(CandidatesType)))
             {
-                Candidates.Add(new Candidate3D(_randomMaker.GenerateSequence(actions[0])));
+                _candidates[t] = new List<Candidate3D>(_minimumCandidates);
+            }
+
+            var candidates = _candidates[CandidatesType.Horizontal];
+            for (var i = 0; i < candidates.Capacity; i++)
+            {
+                candidates.Add(new Candidate3D(_randomMaker.GenerateSequence(actions[0])));
             }
 
             _randomGenerator = new MersenneTwister();
@@ -142,7 +177,13 @@ namespace MotionGenerator
             _locomotionActions = parent._locomotionActions;
             _minimumCandidates = parent._minimumCandidates;
             _randomMaker = parent._randomMaker;
-            Candidates = parent.Candidates.Select(candidate => new Candidate3D(candidate)).ToList();
+
+            foreach (CandidatesType t in Enum.GetValues(typeof(CandidatesType)))
+            {
+                _candidates[t] =
+                    parent._candidates[t].Select(candidate => new Candidate3D(candidate)).ToList();
+            }
+
             _randomGenerator = parent._randomGenerator;
             _manipulatableDimension = parent._manipulatableDimension;
         }
@@ -228,7 +269,7 @@ namespace MotionGenerator
                 if (meanMovementVectorDotDirrection < 0) continue;
 
                 // x秒後の期待回転角と得意な角度の差をみる。回転量が多い場合は、遠回りして目標角に近くなる場合もある。（例：少し右を向けばいいのだけど、右を向く動きがないので、左に大回りするなど）
-                var ang = Mathf.DeltaAngle(targetRotation, candiate.AxisYAngularVelocity * predictionTime);
+                var ang = Mathf.DeltaAngle(targetRotation, candiate.AxisYAngularVelocity * PredictionTime);
 
                 // 角度に比例したペナルティを設定。（cosでも良さそうだが、微小なズレも評価したいため線形で）
                 var discountRatio = Mathf.Max(0, 1 - Mathf.Abs(ang) / 180f);
@@ -284,6 +325,51 @@ namespace MotionGenerator
             return selectedCandidate;
         }
 
+        private void DecideCandidatesType(LocomotionAction locomotionAction, State currentState)
+        {
+            // どのCandidatesを使うか決める
+            _lastCandidatesType = CandidatesType.Horizontal;
+            if (currentState == null)
+            {
+                return;
+            }
+            
+            if (currentState.ContainsKey(State.BasicKeys.TileAngleEachDirection))
+            {
+                // 8方向タイル高さが入力されたなら、高さに応じてCandidateを分ける
+                var tileAngleEachDirection = currentState[State.BasicKeys.TileAngleEachDirection];
+                var divisionNum = tileAngleEachDirection.Count;
+                var eulerAnglesY = Quaternion.LookRotation(locomotionAction.Direction).eulerAngles.y;
+                var directionId = ((int) (eulerAnglesY * (divisionNum * 2) / 360f) + 1) / 2 % divisionNum;
+
+                if (tileAngleEachDirection[directionId] > 0)
+                {
+                    _lastCandidatesType = CandidatesType.Higher;
+                }
+                else if (tileAngleEachDirection[directionId] < 0)
+                {
+                    _lastCandidatesType = CandidatesType.Lower;
+                }
+            }
+
+            if (_lastCandidatesType == CandidatesType.Horizontal &&
+                currentState.ContainsKey(State.BasicKeys.WalkMotion))
+            {
+                if (currentState.GetAsFloat(State.BasicKeys.WalkMotion) > 0)
+                {
+                    // WalkMotion指定されたなら、CandidateをWaking専用にする
+                    _lastCandidatesType = CandidatesType.Walking;
+                    currentState.Set(State.BasicKeys.WalkMotion, 0);
+                }
+            }
+
+            if (_candidates[_lastCandidatesType].Count == 0)
+            {
+                // はじめてのCandidateTypeの場合はFlatをコピーして使う
+                _candidates[_lastCandidatesType] =
+                    _candidates[CandidatesType.Horizontal].Select(candidate => new Candidate3D(candidate)).ToList();
+            }
+        }
 
         public static Candidate3D SelectCandidate(List<Candidate3D> candidates, LocomotionAction locomotionAction,
             bool enableTurn)
@@ -294,34 +380,58 @@ namespace MotionGenerator
                 // 試したことないモーションは無条件で選択する
                 return importantCandidates.UnexecutedCandidate;
             }
-            else if (enableTurn)
+
+            if (enableTurn)
             {
                 return SelectCandidateWithRotationPenalty(candidates, locomotionAction.Direction, importantCandidates);
             }
-            else
-            {
-                // 回転考慮しないなら、目標方向成分が最大のCandidateを選択する
-                return importantCandidates.MaxDirectionalMagunitudeCandidate;
-            }
+
+            // 回転考慮しないなら、目標方向成分が最大のCandidateを選択する
+            return importantCandidates.MaxDirectionalMagunitudeCandidate;
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action)
+        public override List<MotionSequence> GenerateSequence(IAction action, State currentState)
         {
             var locomotionAction = action as LocomotionAction;
             _lastDidFallbacked = (locomotionAction == null);
             if (!_lastDidFallbacked)
             {
-                _lastOutput = SelectCandidate(Candidates, locomotionAction, _enableTurn);
-                _lastAction = action;
+                DecideCandidatesType(locomotionAction, currentState);
+                _lastOutput = SelectCandidate(_candidates[_lastCandidatesType], locomotionAction, _enableTurn);
                 return _lastOutput.Value;
             }
-            else
-            {
-                return _fallbackSequenceMaker.GenerateSequence(action);
-            }
+
+            return _fallbackSequenceMaker.GenerateSequence(action, currentState);
         }
 
-        private float HeuristicPenalty(State currentState, float timeSpan)
+        private float HeuristicPenaltyWalking(State currentState, Vector3 movement, float timeSpan)
+        {
+            var penalty = 1f;
+
+            // Walkingモードは精度重視でペナルティ
+            if (_lastCandidatesType == CandidatesType.Walking && _walkingStep > 0f)
+            {
+                var overDistance = movement.magnitude - _walkingStep;
+                if (0f < overDistance)
+                {
+                    // オーバーランはペナルティ
+                    var overPenalty = _walkingStep - overDistance;
+                    if (overPenalty > 0f)
+                    {
+                        penalty *= overPenalty;
+                    }
+                    else
+                    {
+                        // マイナスだと逆方向になるので0
+                        penalty = 0f;
+                    }
+                }
+            }
+
+            return penalty;
+        }
+
+        private float HeuristicPenaltyConsumptionEnergy(State currentState, Vector3 movement, float timeSpan)
         {
             var penalty = 1f;
 
@@ -345,6 +455,34 @@ namespace MotionGenerator
             return penalty;
         }
 
+
+        private float HeuristicPenaltyHigherLower(State currentState, Vector3 movement, float timeSpan)
+        {
+            var penalty = 1f;
+
+            // 高低移動のペナルティ
+            if (_lastCandidatesType == CandidatesType.Higher && movement.y <= 0f)
+            {
+                penalty = 0f;
+            }
+
+            if (_lastCandidatesType == CandidatesType.Lower && movement.y >= 0f)
+            {
+                penalty = 0f;
+            }
+
+            return penalty;
+        }
+
+        private float HeuristicPenalty(State currentState, Vector3 movement, float timeSpan)
+        {
+            var penalty = 1f;
+            penalty *= HeuristicPenaltyWalking(currentState, movement, timeSpan);
+            penalty *= HeuristicPenaltyConsumptionEnergy(currentState, movement, timeSpan);
+            penalty *= HeuristicPenaltyHigherLower(currentState, movement, timeSpan);
+            return penalty;
+        }
+
         public override void Feedback(float reward, State lastState, State currentState)
         {
             if (!_lastDidFallbacked)
@@ -363,10 +501,10 @@ namespace MotionGenerator
                 var rotation = Mathf.DeltaAngle(lastRotation.eulerAngles.y, currentRotation.eulerAngles.y)
                                / timeSpan;
 
-                var value = movement * HeuristicPenalty(currentState, timeSpan);
+                var value = movement * HeuristicPenalty(currentState, movement, timeSpan);
 
                 _lastOutput.Update(value, rotation);
-                Maintain(_lastAction);
+                _candidates[_lastCandidatesType] = Maintain(_candidates[_lastCandidatesType]);
             }
             else
             {
@@ -473,49 +611,37 @@ namespace MotionGenerator
             return newCandidates;
         }
 
-        private void Maintain(IAction action)
+        private List<Candidate3D> Maintain(List<Candidate3D> candidates, bool force = false)
         {
-            if (_maintainRandom.Sample() < 0.3f * _epsilon)
+            if (force || _maintainRandom.Sample() < 0.3f * _epsilon)
             {
-                if (Candidates.Count >= MaxCandidates)
+                if (candidates.Count >= MaxCandidates)
                 {
-                    Candidates = DeleteBadMotions(Candidates);
+                    candidates = DeleteBadMotions(candidates);
                 }
 
-                if (Candidates.Count >= MaxCandidates)
+                if (candidates.Count >= MaxCandidates)
                 {
                     Debug.LogWarning(
                         "DeleteBadMotionsでモーションが消されてない。DeleteBadMotionsの基準を厳しくして、よりモーションが削除されるようにしたほうがいい");
-                    return;
+                    return candidates;
                 }
 
                 List<MotionSequence> similar =
-                    _randomMaker.GenerateSimilarSequence(action, _lastOutput.Value, 0.3f * _epsilon, false);
-                var duration = similar.Select(motionSequence => motionSequence.GetDuration()).Max();
+                    _randomMaker.GenerateSimilarSequence(null, _lastOutput.Value, 0.3f * _epsilon, false);
 
                 // Action継続時間を可変にし、Evolutionaryで時間スケールの伸縮
                 var maxScaleFactor = 1.2f;
-                var minScaleFactor = duration > MinimumDurationFrame ? 1f / maxScaleFactor : 1f;
+                var minScaleFactor = 1f / maxScaleFactor;
                 var logMinScaleFactor = Mathf.Log(minScaleFactor);
                 var logMaxScaleFactor = Mathf.Log(maxScaleFactor);
                 var scaleFactor = Mathf.Exp((float) _randomGenerator.NextDouble() *
                                             (logMaxScaleFactor - logMinScaleFactor) + logMinScaleFactor);
-                similar = _randomMaker.ChangeTimeScale(action, scaleFactor, similar);
-                if (duration <= MinimumDurationFrame)
-                {
-                    for (int i = 0; i < 100; i++) // whileにしたいけど、無限ループ防止
-                    {
-                        if (similar.Select(motionSequence => motionSequence.GetDuration()).Max() > MinimumDurationFrame)
-                        {
-                            break;
-                        }
-
-                        similar = _randomMaker.ChangeTimeScale(action, scaleFactor, similar);
-                    }
-                }
-
-                Candidates.Add(new Candidate3D(similar));
+                similar = _randomMaker.ChangeTimeScale(null, scaleFactor, similar);
+                candidates.Add(new Candidate3D(similar));
             }
+
+            return candidates;
         }
     }
 }
