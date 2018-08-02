@@ -115,10 +115,6 @@ namespace MotionGenerator
 
         public override List<MotionSequence> GenerateSequence(IAction action)
         {
-//            foreach (var k in _candidatesDict.Keys)
-//            {
-//                Debug.Log(k.Name);
-//            }
             var candidates = _candidatesDict[action.Name];
             _lastOutput = SelectByExpect(candidates);
             _lastAction = action;
@@ -132,17 +128,14 @@ namespace MotionGenerator
             var randomMaker = _randomMakerDict[action.Name];
             var candidates = _candidatesDict[action.Name];
 
-            if (_maintainRandom.Sample() < 0.166667f * _epsilon)
+            if (_maintainRandom.Sample() < _epsilon)
             {
-                candidates = candidates.OrderBy(o => o.mean).ToList(); // TODO performance check
+                candidates = candidates.OrderBy(o => o.mean).ToList();
 
                 candidates.RemoveAt(0); // delete a worst candidate
                 Candidate maxCandidate = candidates[candidates.Count - 1];
-
-//				candidates.Add (new Candidate(randomMaker.GenerateSequence(action)));
-//				candidates.Add (new Candidate (maxCandidate.value));
                 candidates.Add(
-                    new Candidate(randomMaker.GenerateSimilarSequence(action, maxCandidate.value, 0.3f * _epsilon, true)));
+                    new Candidate(randomMaker.GenerateSimilarSequence(action, maxCandidate.value, _epsilon, true)));
 
                 _candidatesDict[action.Name] = candidates;
             }
