@@ -263,10 +263,10 @@ namespace MotionGenerator
             var maxScore = float.MinValue;
             foreach (var candiate in candidates)
             {
-                var meanMovementVectorDotDirrection = Vector3.Dot(candiate.Mean, dir);
+                var meanMovementVectorDotDirection = Vector3.Dot(candiate.Mean, dir);
 
                 // 暫定的に、目標地点から離れる動きは除外（目標地点までに距離を考慮しないと移動距離が評価できないことと、壁にぶつかりスタックする現象を避けるため）
-                if (meanMovementVectorDotDirrection < 0) continue;
+                if (meanMovementVectorDotDirection < 0) continue;
 
                 // x秒後の期待回転角と得意な角度の差をみる。回転量が多い場合は、遠回りして目標角に近くなる場合もある。（例：少し右を向けばいいのだけど、右を向く動きがないので、左に大回りするなど）
                 var ang = Mathf.DeltaAngle(targetRotation, candiate.AxisYAngularVelocity * PredictionTime);
@@ -274,7 +274,7 @@ namespace MotionGenerator
                 // 角度に比例したペナルティを設定。（cosでも良さそうだが、微小なズレも評価したいため線形で）
                 var discountRatio = Mathf.Max(0, 1 - Mathf.Abs(ang) / 180f);
 
-                var score = meanMovementVectorDotDirrection * discountRatio;
+                var score = meanMovementVectorDotDirection * discountRatio;
                 if (maxScore < score)
                 {
                     maxScore = score;
