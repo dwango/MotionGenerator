@@ -53,7 +53,7 @@ namespace MotionGenerator.Serialization
         }
 
         [Test]
-        public void MessagePackObject属性クラスがIALifeSerializableである()
+        public void MessagePackObject属性クラスがIMotionGeneratorSerializableである()
         {
             MessagePackSerializer.SetDefaultResolver(MessagePack.Resolvers.StandardResolver.Instance);
             foreach (var type in GetAllSerializableTypes())

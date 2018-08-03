@@ -10,7 +10,6 @@ namespace MotionGenerator.Entity.Soul
         protected abstract string Key();
 
         // Rewardの絶対値が1前後になるようにする調整係数
-        // TODO(ogaki): 本来生命の身体とセンサーのレンジによって変わる
         protected const float NormalizationCoefficient = 1000;
 
         /// <summary>
