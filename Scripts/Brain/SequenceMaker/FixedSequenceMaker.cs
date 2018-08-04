@@ -8,17 +8,6 @@ namespace MotionGenerator
     {
         private Dictionary<string, List<MotionSequence>> _motionDict;
 
-        private const string ThisTypeString = "FixedSequenceMaker";
-
-        static FixedSequenceMaker()
-        {
-            SequenceMakerSaveData.AddDeserializer(ThisTypeString, baseData =>
-            {
-                var saveData = MotionGeneratorSerialization.Deserialize<FixedSequenceMakerSaveData>(baseData);
-                return new FixedSequenceMaker(saveData);
-            });
-        }
-
         public FixedSequenceMaker(Dictionary<string, List<MotionSequence>> motionDict)
         {
             _motionDict = motionDict;
@@ -34,7 +23,7 @@ namespace MotionGenerator
 
         public override SequenceMakerSaveData SaveAsInterface()
         {
-            return new SequenceMakerSaveData(ThisTypeString, MotionGeneratorSerialization.Serialize(
+            return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(
                 new FixedSequenceMakerSaveData(
                     _motionDict.ToDictionary(
                         kv => kv.Key,

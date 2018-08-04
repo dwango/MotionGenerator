@@ -16,9 +16,6 @@ namespace MotionGenerator
         private Dictionary<string, RandomSequenceMaker> _randomMakerDict;
         private int _manipulatableDimension;
         private List<IAction> _actions;
-
-        private const string ThisTypeString = "EvolutionarySequenceMaker";
-
         public EvolutionarySequenceMaker(float epsilon, int minimumCandidates)
         {
             _epsilon = epsilon;
@@ -54,7 +51,7 @@ namespace MotionGenerator
 
         public override SequenceMakerSaveData SaveAsInterface()
         {
-            return new SequenceMakerSaveData(GetType().ToString(), MotionGeneratorSerialization.Serialize(Save()));
+            return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
         public override void Init(List<IAction> actions, List<int> manipulationDimensions)
