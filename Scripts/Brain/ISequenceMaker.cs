@@ -12,6 +12,6 @@ namespace MotionGenerator
         void Restore(List<IAction> actions, List<int> manipulatableDimensions);
         List<MotionSequence> GenerateSequence(IAction action, State currentState);
         void Feedback(float reward, State lastState, State currentState);
-        ISequenceMakerSaveData SaveAsInterface();
+        SequenceMakerSaveData SaveAsInterface();
     }
 }

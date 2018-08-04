@@ -7,7 +7,7 @@ namespace MotionGenerator.Serialization
     [MessagePackObject]
     public sealed class FixedSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<FixedSequenceMakerSaveData>
     {
-        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
+//        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public Dictionary<string, List<MotionSequenceSaveData>> MotionDict { get; set; }
 
         public FixedSequenceMakerSaveData()
@@ -15,10 +15,8 @@ namespace MotionGenerator.Serialization
             
         }
 
-        public FixedSequenceMakerSaveData(SequenceMakerBaseSaveData sequenceMakerBase,
-            Dictionary<string, List<MotionSequenceSaveData>> motionDict)
+        public FixedSequenceMakerSaveData(Dictionary<string, List<MotionSequenceSaveData>> motionDict)
         {
-            SequenceMakerBase = sequenceMakerBase;
             MotionDict = motionDict;
         }
 

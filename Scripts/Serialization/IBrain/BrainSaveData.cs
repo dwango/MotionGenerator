@@ -7,16 +7,17 @@ namespace MotionGenerator.Serialization
     public sealed class BrainSaveData : IBrainSaveData, IMotionGeneratorSerializable<BrainSaveData>
     {
         [Key(0)] public IDecisionMakerSaveData DecisionMaker { get; set; }
-        [Key(1)] public ISequenceMakerSaveData SequenceMaker { get; set; }
+//        [Key(1)] public ISequenceMakerSaveData SequenceMaker { get; set; }
         [Key(2)] public IActionSaveData CurrentAction { get; set; }
         [Key(3)] public StateSaveData LastState { get; set; }
+        [Key(4)] public SequenceMakerSaveData SequenceMaker { get; set; }
 
         public BrainSaveData()
         {
             
         }
 
-        public BrainSaveData(IDecisionMakerSaveData decisionMaker, ISequenceMakerSaveData sequenceMaker,
+        public BrainSaveData(IDecisionMakerSaveData decisionMaker, SequenceMakerSaveData sequenceMaker,
             IActionSaveData currentAction, StateSaveData lastState)
         {
             DecisionMaker = decisionMaker;

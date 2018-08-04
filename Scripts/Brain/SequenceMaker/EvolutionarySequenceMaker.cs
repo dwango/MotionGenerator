@@ -17,6 +17,8 @@ namespace MotionGenerator
         private int _manipulatableDimension;
         private List<IAction> _actions;
 
+        private const string ThisTypeString = "EvolutionarySequenceMaker";
+
         public EvolutionarySequenceMaker(float epsilon, int minimumCandidates)
         {
             _epsilon = epsilon;
@@ -26,7 +28,6 @@ namespace MotionGenerator
         }
 
         public EvolutionarySequenceMaker(EvolutionarySequenceMakerSaveData saveData)
-            : base(saveData.SequenceMakerBase)
         {
             _epsilon = saveData.Epsilon;
             _minimumCandidates = saveData.MinimumCandidates;
@@ -39,10 +40,9 @@ namespace MotionGenerator
                 saveData.RandomMakerDict.ToDictionary(kv => kv.Key, kv => new RandomSequenceMaker(kv.Value));
         }
 
-        public new EvolutionarySequenceMakerSaveData Save()
+        public EvolutionarySequenceMakerSaveData Save()
         {
             return new EvolutionarySequenceMakerSaveData(
-                base.Save(),
                 _epsilon,
                 _minimumCandidates,
                 _lastAction.SaveAsInterface(),
@@ -52,9 +52,9 @@ namespace MotionGenerator
             );
         }
 
-        public override ISequenceMakerSaveData SaveAsInterface()
+        public override SequenceMakerSaveData SaveAsInterface()
         {
-            return Save();
+            return new SequenceMakerSaveData(GetType().ToString(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
         public override void Init(List<IAction> actions, List<int> manipulationDimensions)
@@ -74,6 +74,7 @@ namespace MotionGenerator
                 {
                     candidates.Add(new Candidate(rsm.GenerateSequence(action)));
                 }
+
                 _candidatesDict.Add(action.Name, candidates);
             }
         }
@@ -152,6 +153,7 @@ namespace MotionGenerator
                     curiousCandidate = candiate;
                 }
             }
+
             return curiousCandidate;
         }
 

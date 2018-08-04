@@ -5,6 +5,15 @@ namespace MotionGenerator
 {
     public class SimpleBanditSequenceMakerRandom : SimpleBanditSequenceMaker
     {
+        private const string ThisTypeString = "SimpleBanditSequenceMakerRandom";
+        static SimpleBanditSequenceMakerRandom()
+        {
+            SequenceMakerSaveData.AddDeserializer(ThisTypeString, baseData =>
+            {
+                var saveData = MotionGeneratorSerialization.Deserialize<SimpleBanditSequenceMakerRandomSaveData>(baseData);
+                return new SimpleBanditSequenceMakerRandom(saveData);
+            });
+        }
         public SimpleBanditSequenceMakerRandom(float epsilon, int minimumCandidates) : base(epsilon, minimumCandidates)
         {
         }
@@ -20,10 +29,10 @@ namespace MotionGenerator
                 base.Save()
             );
         }
-
-        public override ISequenceMakerSaveData SaveAsInterface()
+        
+        public override SequenceMakerSaveData SaveAsInterface()
         {
-            return Save();
+            return new SequenceMakerSaveData(ThisTypeString, MotionGeneratorSerialization.Serialize(Save()));
         }
 
         protected override Candidate SelectByCuriosity(List<Candidate> candidates)

@@ -17,8 +17,17 @@ namespace MotionGenerator
         private Dictionary<string, List<Candidate>> _candidatesDict;
         private Dictionary<string, RandomSequenceMaker> _randomMakerDict;
         private readonly int _numControlPoints;
+        private const string ThisTypeString = "RandomSequenceMaker";
 
         protected MersenneTwister RandomGenerator = new MersenneTwister(0);
+        static SimpleBanditSequenceMaker()
+        {
+            SequenceMakerSaveData.AddDeserializer(ThisTypeString, baseData =>
+            {
+                var saveData = MotionGeneratorSerialization.Deserialize<SimpleBanditSequenceMakerSaveData>(baseData);
+                return new SimpleBanditSequenceMaker(saveData);
+            });
+        }
 
         public SimpleBanditSequenceMaker(float epsilon, int minimumCandidates, int numControlPoints = 3,
             int maxSequenceLength = 100)
@@ -29,7 +38,6 @@ namespace MotionGenerator
         }
 
         public SimpleBanditSequenceMaker(SimpleBanditSequenceMakerSaveData saveData)
-            : base(saveData.SequenceMakerBase)
         {
             _epsilon = saveData.Epsilon;
             _minimumCandidates = saveData.MinimumCandidates;
@@ -46,10 +54,9 @@ namespace MotionGenerator
             _numControlPoints = saveData.NumControlPoints;
         }
 
-        public new SimpleBanditSequenceMakerSaveData Save()
+        public SimpleBanditSequenceMakerSaveData Save()
         {
             return new SimpleBanditSequenceMakerSaveData(
-                base.Save(),
                 _epsilon,
                 _minimumCandidates,
                 _lastAction.SaveAsInterface(),
@@ -66,9 +73,9 @@ namespace MotionGenerator
             );
         }
 
-        public override ISequenceMakerSaveData SaveAsInterface()
+        public override SequenceMakerSaveData SaveAsInterface()
         {
-            return Save();
+            return new SequenceMakerSaveData(ThisTypeString, MotionGeneratorSerialization.Serialize(Save()));
         }
 
         public override void Init(List<IAction> actions, List<int> manipulationDimensions)

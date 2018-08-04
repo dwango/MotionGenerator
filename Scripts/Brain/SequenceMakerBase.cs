@@ -20,19 +20,7 @@ namespace MotionGenerator
             MaxSequenceLength = (int) Math.Ceiling(min + (max - min) * (float) Beta.Sample(2.0, 2.0));
         }
 
-        protected SequenceMakerBase(SequenceMakerBaseSaveData saveData)
-        {
-        }
-
-        public SequenceMakerBaseSaveData Save()
-        {
-            return new SequenceMakerBaseSaveData();
-        }
-
-        public virtual ISequenceMakerSaveData SaveAsInterface()
-        {
-            return Save();
-        }
+        public abstract SequenceMakerSaveData SaveAsInterface();
 
         // new
         public abstract void Init(List<IAction> actions, List<int> manipulationDimensions);

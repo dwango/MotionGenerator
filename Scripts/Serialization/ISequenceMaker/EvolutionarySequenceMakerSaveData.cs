@@ -7,7 +7,7 @@ namespace MotionGenerator.Serialization
     [MessagePackObject]
     public sealed class EvolutionarySequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<EvolutionarySequenceMakerSaveData>
     {
-        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
+//        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public float Epsilon { get; set; }
         [Key(2)] public int MinimumCandidates { get; set; }
         [Key(3)] public IActionSaveData LastAction { get; set; }
@@ -17,15 +17,13 @@ namespace MotionGenerator.Serialization
 
         public EvolutionarySequenceMakerSaveData()
         {
-            
         }
 
-        public EvolutionarySequenceMakerSaveData(SequenceMakerBaseSaveData sequenceMakerBase, float epsilon,
+        public EvolutionarySequenceMakerSaveData(float epsilon,
             int minimumCandidates, IActionSaveData lastAction, CandidateSaveData lastOutput,
             Dictionary<string, List<CandidateSaveData>> candidatesDict,
             Dictionary<string, RandomSequenceMakerSaveData> randomMakerDict)
         {
-            SequenceMakerBase = sequenceMakerBase;
             Epsilon = epsilon;
             MinimumCandidates = minimumCandidates;
             LastAction = lastAction;

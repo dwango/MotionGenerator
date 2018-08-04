@@ -7,7 +7,7 @@ namespace MotionGenerator.Serialization
     [MessagePackObject]
     public sealed class SimpleBanditSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<SimpleBanditSequenceMakerSaveData>
     {
-        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
+//        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public float Epsilon { get; set; }
         [Key(2)] public int MinimumCandidates { get; set; }
         [Key(3)] public IActionSaveData LastAction { get; set; }
@@ -21,12 +21,11 @@ namespace MotionGenerator.Serialization
             
         }
 
-        public SimpleBanditSequenceMakerSaveData(SequenceMakerBaseSaveData sequenceMakerBase, float epsilon,
+        public SimpleBanditSequenceMakerSaveData(float epsilon,
             int minimumCandidates, IActionSaveData lastAction, CandidateSaveData lastOutput,
             Dictionary<string, List<CandidateSaveData>> candidatesDict,
             Dictionary<string, RandomSequenceMakerSaveData> randomMakerDict, int numControlPoints)
         {
-            SequenceMakerBase = sequenceMakerBase;
             Epsilon = epsilon;
             MinimumCandidates = minimumCandidates;
             LastAction = lastAction;

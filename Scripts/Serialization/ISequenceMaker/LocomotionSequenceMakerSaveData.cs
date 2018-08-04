@@ -6,7 +6,7 @@ namespace MotionGenerator.Serialization
     [MessagePackObject]
     public sealed class LocomotionSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<LocomotionSequenceMakerSaveData>
     {
-        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
+//        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
         [Key(1)] public float Epsilon { get; set; }
         [Key(2)] public int MinimumCandidates { get; set; }
         [Key(3)] public float TimeScale { get; set; }
@@ -15,7 +15,7 @@ namespace MotionGenerator.Serialization
         [Key(6)] public Candidate3DSaveData LastOutput { get; set; }
         [Key(7)] public List<Candidate3DSaveData> Candidates { get; set; }
         [Key(8)] public RandomSequenceMakerSaveData RandomMaker { get; set; }
-        [Key(9)] public ISequenceMakerSaveData FallbackSequenceMaker { get; set; }
+//        [Key(9)] public ISequenceMakerSaveData FallbackSequenceMaker { get; set; }
         [Key(10)] public int ManipulatableDimension { get; set; }
         [Key(11)] public bool EnableTurn { get; set; }
         [Key(12)] public float ConsumptionEnergyCoef { get; set; }
@@ -25,6 +25,7 @@ namespace MotionGenerator.Serialization
         [Key(16)] public List<Candidate3DSaveData> CandidatesLower { get; set; }
         [Key(17)] public List<Candidate3DSaveData> CandidatesWalking { get; set; }
         [Key(18)] public float WalkingStep { get; set; }
+        [Key(19)] public SequenceMakerSaveData FallbackSequenceMaker { get; set; }
         
 
         public LocomotionSequenceMakerSaveData()
@@ -32,16 +33,15 @@ namespace MotionGenerator.Serialization
             
         }
 
-        public LocomotionSequenceMakerSaveData(SequenceMakerBaseSaveData sequenceMakerBase, float epsilon,
+        public LocomotionSequenceMakerSaveData(float epsilon,
             int minimumCandidates, float timeScale, List<LocomotionActionSaveData> locomotionActions,
             Candidate3DSaveData lastOutput, LocomotionSequenceMaker.CandidatesType lastCandidatesType,
             List<Candidate3DSaveData> candidates, List<Candidate3DSaveData> candidatesHigher,
             List<Candidate3DSaveData> candidatesLower,  List<Candidate3DSaveData> candidatesWalking,
-            RandomSequenceMakerSaveData randomMaker, ISequenceMakerSaveData fallbackSequenceMaker,
+            RandomSequenceMakerSaveData randomMaker, SequenceMakerSaveData fallbackSequenceMaker,
             int manipulatableDimension, bool enableTurn,
             float consumptionEnergyCoef, float consumptionEnergyPenaltyWeight, float walkingStep)
         {
-            SequenceMakerBase = sequenceMakerBase;
             Epsilon = epsilon;
             MinimumCandidates = minimumCandidates;
             TimeScale = timeScale;
@@ -60,6 +60,7 @@ namespace MotionGenerator.Serialization
             ConsumptionEnergyPenaltyWeight = consumptionEnergyPenaltyWeight;
             WalkingStep = walkingStep;
         }
+
 
         public LocomotionSequenceMaker Instantiate()
         {

@@ -16,6 +16,16 @@ namespace MotionGenerator
         private List<int> _outputDimentions;
 
         private readonly MersenneTwister _randomGenerator;
+        private const string ThisTypeString = "RandomSequenceMaker";
+
+        static RandomSequenceMaker()
+        {
+            SequenceMakerSaveData.AddDeserializer(ThisTypeString, baseData =>
+            {
+                var saveData = MotionGeneratorSerialization.Deserialize<LocomotionSequenceMakerSaveData>(baseData);
+                return new LocomotionSequenceMaker(saveData);
+            });
+        }
 
         public RandomSequenceMaker(float timeRange, float valueRange, int numControlPoints)
         {
@@ -35,7 +45,6 @@ namespace MotionGenerator
         }
 
         public RandomSequenceMaker(RandomSequenceMakerSaveData saveData)
-            : base(saveData.SequenceMakerBase)
         {
             _timeRange = saveData.TimeRange;
             _valueRange = saveData.ValueRange;
@@ -44,10 +53,9 @@ namespace MotionGenerator
             _randomGenerator = new MersenneTwister();
         }
 
-        public new RandomSequenceMakerSaveData Save()
+        public RandomSequenceMakerSaveData Save()
         {
             return new RandomSequenceMakerSaveData(
-                base.Save(),
                 _timeRange,
                 _valueRange,
                 _numControlPoints,
@@ -55,11 +63,11 @@ namespace MotionGenerator
             );
         }
 
-        public override ISequenceMakerSaveData SaveAsInterface()
+        public override SequenceMakerSaveData SaveAsInterface()
         {
-            return Save();
+            return new SequenceMakerSaveData(ThisTypeString, MotionGeneratorSerialization.Serialize(Save()));
         }
-
+        
         public override void Init(List<IAction> actions, List<int> manipulationDimensions)
         {
             _outputDimentions = manipulationDimensions;
