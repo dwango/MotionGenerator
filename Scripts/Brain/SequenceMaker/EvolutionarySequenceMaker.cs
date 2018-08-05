@@ -16,16 +16,28 @@ namespace MotionGenerator
         private Dictionary<string, RandomSequenceMaker> _randomMakerDict;
         private int _manipulatableDimension;
         private List<IAction> _actions;
-        public EvolutionarySequenceMaker(float epsilon, int minimumCandidates)
+        private readonly ContinuousUniform _maintainRandom = new ContinuousUniform(0, 1.0, new MersenneTwister(0));
+        private int _sequenceLength;
+
+        public EvolutionarySequenceMaker(float epsilon, int minimumCandidates, int sequenceLength = -1)
         {
             _epsilon = epsilon;
             _minimumCandidates = minimumCandidates;
+            if (sequenceLength < 0)
+            {
+                _sequenceLength = MaxSequenceLength;
+            }
+            else
+            {
+                _sequenceLength = sequenceLength;
+            }
             _lastAction = new GoForwardCoordinateAction("");
             _lastOutput = new Candidate(new List<MotionSequence>());
         }
 
         public EvolutionarySequenceMaker(EvolutionarySequenceMakerSaveData saveData)
         {
+            _sequenceLength = MaxSequenceLength;
             _epsilon = saveData.Epsilon;
             _minimumCandidates = saveData.MinimumCandidates;
             _lastAction = saveData.LastAction.Instantiate();
@@ -62,7 +74,7 @@ namespace MotionGenerator
             _candidatesDict = new Dictionary<string, List<Candidate>>();
             foreach (var action in _actions)
             {
-                var rsm = new RandomSequenceMaker(MaxSequenceLength, 1, 3);
+                var rsm = new RandomSequenceMaker(_sequenceLength, 1, 3);
                 rsm.Init(new List<IAction> {action}, manipulationDimensions);
                 _randomMakerDict.Add(action.Name, rsm);
 
@@ -118,8 +130,6 @@ namespace MotionGenerator
             _lastAction = action;
             return _lastOutput.value;
         }
-
-        private readonly ContinuousUniform _maintainRandom = new ContinuousUniform(0, 1.0, new MersenneTwister(0));
 
         void Maintain(IAction action)
         {
