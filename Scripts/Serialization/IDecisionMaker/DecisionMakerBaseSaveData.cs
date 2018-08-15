@@ -7,14 +7,14 @@ namespace MotionGenerator.Serialization
     [MessagePackObject]
     public sealed class DecisionMakerBaseSaveData : IDecisionMakerSaveData, IMotionGeneratorSerializable<DecisionMakerBaseSaveData>
     {
-        [Key(0)] public List<IActionSaveData> Actions { get; set; }
+        [Key(0)] public List<ActionSaveData> Actions { get; set; }
 
         public DecisionMakerBaseSaveData()
         {
             
         }
 
-        public DecisionMakerBaseSaveData(List<IActionSaveData> actions)
+        public DecisionMakerBaseSaveData(List<ActionSaveData> actions)
         {
             Actions = actions;
         }

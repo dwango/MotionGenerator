@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using MotionGenerator.Serialization;
+﻿using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {
@@ -33,10 +32,7 @@ namespace MotionGenerator
             );
         }
 
-        public virtual IActionSaveData SaveAsInterface()
-        {
-            return Save();
-        }
+        public abstract ActionSaveData SaveAsInterface();
 
         public abstract IAction Clone();
         public abstract float Reward(State lastState, State nowState);

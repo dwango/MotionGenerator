@@ -8,7 +8,7 @@ namespace MotionGenerator.Serialization
     {
         [Key(0)] public IDecisionMakerSaveData DecisionMaker { get; set; }
 //        [Key(1)] public ISequenceMakerSaveData SequenceMaker { get; set; }
-        [Key(2)] public IActionSaveData CurrentAction { get; set; }
+        [Key(2)] public ActionSaveData CurrentAction { get; set; }
         [Key(3)] public StateSaveData LastState { get; set; }
         [Key(4)] public SequenceMakerSaveData SequenceMaker { get; set; }
 
@@ -18,7 +18,7 @@ namespace MotionGenerator.Serialization
         }
 
         public BrainSaveData(IDecisionMakerSaveData decisionMaker, SequenceMakerSaveData sequenceMaker,
-            IActionSaveData currentAction, StateSaveData lastState)
+            ActionSaveData currentAction, StateSaveData lastState)
         {
             DecisionMaker = decisionMaker;
             SequenceMaker = sequenceMaker;

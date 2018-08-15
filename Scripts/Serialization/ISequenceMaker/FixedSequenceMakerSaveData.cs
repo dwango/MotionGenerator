@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using MessagePack;
-using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
     public sealed class FixedSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<FixedSequenceMakerSaveData>
     {
-//        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
-        [Key(1)] public Dictionary<string, List<MotionSequenceSaveData>> MotionDict { get; set; }
+        [Key(0)] public Dictionary<string, List<MotionSequenceSaveData>> MotionDict { get; set; }
 
         public FixedSequenceMakerSaveData()
         {

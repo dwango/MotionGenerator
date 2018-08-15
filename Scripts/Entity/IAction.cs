@@ -8,6 +8,6 @@ namespace MotionGenerator
         string Name { get; }
         IAction Clone();
         float Reward(State lastState, State nowState);
-        IActionSaveData SaveAsInterface();
+        ActionSaveData SaveAsInterface();
     }
 }

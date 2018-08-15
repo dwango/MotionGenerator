@@ -1,6 +1,4 @@
-﻿using System;
-using MotionGenerator.Serialization;
-using UnityEngine;
+﻿using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {
@@ -30,9 +28,9 @@ namespace MotionGenerator
             );
         }
 
-        public override IActionSaveData SaveAsInterface()
+        public override ActionSaveData SaveAsInterface()
         {
-            return Save();
+            return new ActionSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
         public override IAction Clone()

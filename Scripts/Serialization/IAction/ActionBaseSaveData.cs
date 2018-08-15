@@ -1,5 +1,4 @@
 ﻿using MessagePack;
-using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {

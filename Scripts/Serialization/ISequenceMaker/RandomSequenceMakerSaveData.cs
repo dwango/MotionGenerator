@@ -7,11 +7,10 @@ namespace MotionGenerator.Serialization
     [MessagePackObject]
     public sealed class RandomSequenceMakerSaveData : ISequenceMakerSaveData, IMotionGeneratorSerializable<RandomSequenceMakerSaveData>
     {
-//        [Key(0)] public SequenceMakerBaseSaveData SequenceMakerBase { get; set; }
-        [Key(1)] public float TimeRange { get; set; }
-        [Key(2)] public float ValueRange { get; set; }
-        [Key(3)] public int NumControlPoints { get; set; }
-        [Key(4)] public List<int> OutputDimentions { get; set; }
+        [Key(0)] public float TimeRange { get; set; }
+        [Key(1)] public float ValueRange { get; set; }
+        [Key(2)] public int NumControlPoints { get; set; }
+        [Key(3)] public List<int> OutputDimentions { get; set; }
 
         public RandomSequenceMakerSaveData()
         {
