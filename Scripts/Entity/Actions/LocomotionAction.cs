@@ -9,7 +9,12 @@ namespace MotionGenerator
     {
         public static List<IAction> EightDirections()
         {
-            return new List<IAction>
+            return new List<IAction>(EightDirectionsAsLocomotionActions());
+        }
+
+        public static IEnumerable<LocomotionAction> EightDirectionsAsLocomotionActions()
+        {
+            return new List<LocomotionAction>
             {
                 GoStraight(),
                 GoForwardRight(),
@@ -21,6 +26,7 @@ namespace MotionGenerator
                 GoForwardLeft(),
             };
         }
+
 
         public static LocomotionAction GoStraight(string name = "forward")
         {
@@ -102,16 +108,18 @@ namespace MotionGenerator
             return new LocomotionAction(this);
         }
 
-        private static Vector3 GetLastMovement(State lastState, State nowState)
+        public static Vector3 GetLastMovement(State lastState, State nowState)
         {
             if (!(lastState.ContainsKey(State.BasicKeys.Position) && nowState.ContainsKey(State.BasicKeys.Position)))
             {
                 throw new ArgumentException("need position");
             }
+
             if (!(lastState.ContainsKey(State.BasicKeys.Rotation)))
             {
                 throw new ArgumentException("need rotation");
             }
+
             var rotationVector = lastState[State.BasicKeys.Rotation];
             var rotation = new Quaternion(
                 (float) rotationVector[0],

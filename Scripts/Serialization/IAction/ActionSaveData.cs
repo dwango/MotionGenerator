@@ -75,6 +75,11 @@ namespace MotionGenerator.Serialization
                 var saveData = MotionGeneratorSerialization.Deserialize<LocomotionActionSaveData>(baseData);
                 return new LocomotionAction(saveData);
             });
+            AddDeserializer<WalkingLocomotionAction>(baseData =>
+            {
+                var saveData = MotionGeneratorSerialization.Deserialize<LocomotionActionSaveData>(baseData);
+                return new WalkingLocomotionAction(new LocomotionAction(saveData));
+            });
         }
 
         static ActionSaveData()
