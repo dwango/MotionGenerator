@@ -15,22 +15,22 @@ namespace MotionGenerator
 
         private readonly LocomotionAction _baseAction;
 
-        public WalkingLocomotionAction(LocomotionAction baseAction)
+        public WalkingLocomotionAction(LocomotionAction baseAction): base("Walking"+baseAction.Name)
         {
             _baseAction = baseAction;
         }
-
+        
         private float HeuristicPenaltyWalking(State lastState, State nowState)
         {
             var penalty = 1f;
             var movement = LocomotionAction.GetLastMovement(lastState, nowState);
-            var _walkingStep = nowState.GetAsFloat(State.BasicKeys.BodyScale);
+            var targetStepSize = nowState.GetAsFloat(State.BasicKeys.BodyScale);
 
-            var overDistance = movement.magnitude - _walkingStep;
+            var overDistance = movement.magnitude - targetStepSize;
             if (0f < overDistance)
             {
                 // オーバーランはペナルティ
-                var overPenalty = _walkingStep - overDistance;
+                var overPenalty = targetStepSize - overDistance;
                 if (overPenalty > 0f)
                 {
                     penalty *= overPenalty;
