@@ -16,6 +16,7 @@ namespace MotionGenerator
         private float _nearbyDistance;
 
         private List<IAction> _locomotionActions;
+        private List<IAction> _walkingLocomotionActions;
         private IAction _forwardAction;
         private IAction _stayAction;
         private IAction _restAction;
@@ -63,6 +64,7 @@ namespace MotionGenerator
 
         private void Init()
         {
+            _walkingLocomotionActions = Actions.Where(x => x.GetType() == typeof(WalkingLocomotionAction)).ToList();
             _locomotionActions = Actions.Where(x => x.GetType() == typeof(LocomotionAction)).ToList();
             Assert.IsTrue(_locomotionActions.Count % 4 == 0);
 
@@ -106,6 +108,7 @@ namespace MotionGenerator
             {
                 _restAction = _stayAction;
             }
+
             if (_hopAction == null)
             {
                 _hopAction = _stayAction;
@@ -153,7 +156,6 @@ namespace MotionGenerator
 
         public override IAction DecideAction(State state)
         {
-            var direction = _locomotionActions.Count;
             var sightRange = state.GetAsFloat(State.BasicKeys.SightRange);
             var stayableRatio = _stayableDistance / sightRange;
             var nearbyRatio = _nearbyDistance / sightRange;
@@ -162,6 +164,7 @@ namespace MotionGenerator
             {
                 var target = state.GetAsVector3(_stateKeys[i]);
                 var magnitude = target.magnitude;
+                var angle = Quaternion.LookRotation(target).eulerAngles.y + (_isNegative ? 180f : 0);
 
                 if (magnitude <= 1f)
                 {
@@ -172,18 +175,16 @@ namespace MotionGenerator
                     }
 
                     // ターゲットに近くなってきたらSequenceMakerに歩きモーションを要求
-                    if (magnitude <= nearbyRatio)
+                    if (magnitude <= nearbyRatio && _walkingLocomotionActions.Count > 0)
                     {
-                        if (state.ContainsKey(State.BasicKeys.WalkMotion) == false)
-                        {
-                            state[State.BasicKeys.WalkMotion] = new DenseVector(1);
-                        }
-                        
-                        state.Set(State.BasicKeys.WalkMotion, 1);
+                        var direction = _walkingLocomotionActions.Count;
+                        return _walkingLocomotionActions[((int) (angle * (direction * 2) / 360f) + 1) / 2 % direction];
                     }
-
-                    var angle = Quaternion.LookRotation(target).eulerAngles.y + (_isNegative ? 180f : 0);
-                    return _locomotionActions[((int) (angle * (direction * 2) / 360f) + 1) / 2 % direction];
+                    else
+                    {
+                        var direction = _locomotionActions.Count;
+                        return _locomotionActions[((int) (angle * (direction * 2) / 360f) + 1) / 2 % direction];
+                    }
                 }
             }
 
