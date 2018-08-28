@@ -41,12 +41,10 @@ namespace MotionGenerator
 
         public override float Reward(State lastState, State nowState)
         {
-            var rotatedAngle = GetRotatedAngle(lastState, nowState);
-            var movedDistance = GetMovedDistance(lastState, nowState);
             var actionTime = GetActionTime(lastState, nowState);
             var manipulatorEnergyConsumption = GetAverageManipulatorEnergyConsumption(nowState);
 
-            return -(Mathf.Abs(rotatedAngle) / 180f + movedDistance) / actionTime * manipulatorEnergyConsumption;
+            return -manipulatorEnergyConsumption / actionTime;
         }
     }
 }

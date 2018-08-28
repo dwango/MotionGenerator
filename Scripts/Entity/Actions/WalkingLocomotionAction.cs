@@ -13,11 +13,11 @@ namespace MotionGenerator
                 .Select(locomotionAction => new WalkingLocomotionAction(locomotionAction)).ToList());
         }
 
-        private readonly LocomotionAction _baseAction;
+        public readonly LocomotionAction BaseAction;
 
         public WalkingLocomotionAction(LocomotionAction baseAction): base("Walking"+baseAction.Name)
         {
-            _baseAction = baseAction;
+            BaseAction = baseAction;
         }
         
         private float HeuristicPenaltyWalking(State lastState, State nowState)
@@ -52,18 +52,18 @@ namespace MotionGenerator
                 throw new ArgumentException($"need {State.BasicKeys.BodyScale}");
             }
 
-            return _baseAction.Reward(lastState, nowState) * HeuristicPenaltyWalking(lastState, nowState);
+            return BaseAction.Reward(lastState, nowState) * HeuristicPenaltyWalking(lastState, nowState);
         }
 
         public override ActionSaveData SaveAsInterface()
         {
             return new ActionSaveData(GetType(),
-                MotionGeneratorSerialization.Serialize(_baseAction.SaveAsLocomotion()));
+                MotionGeneratorSerialization.Serialize(BaseAction.SaveAsLocomotion()));
         }
 
         public override IAction Clone()
         {
-            return new WalkingLocomotionAction(_baseAction.Clone() as LocomotionAction);
+            return new WalkingLocomotionAction(BaseAction.Clone() as LocomotionAction);
         }
     }
 }
