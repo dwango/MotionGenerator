@@ -14,9 +14,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeObjectPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new AvoidObjectSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -27,9 +27,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeObjectPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new BumpingDifferenceialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -49,9 +49,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeObjectPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new ModerateBumpingDifferenceialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

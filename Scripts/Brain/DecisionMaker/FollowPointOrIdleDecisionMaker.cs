@@ -51,7 +51,7 @@ namespace MotionGenerator
             _nearbyDistance = saveData.NearbyDistance;
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new FollowPointOrIdleDecisionMakerSaveData Save()
         {
             return new FollowPointOrIdleDecisionMakerSaveData(
                 (DecisionMakerBaseSaveData) base.Save(),
@@ -62,6 +62,11 @@ namespace MotionGenerator
             );
         }
 
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
+        }
+        
         private void Init()
         {
             _walkingLocomotionActions = Actions.Where(x => x.GetType() == typeof(WalkingLocomotionAction)).ToList();

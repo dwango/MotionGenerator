@@ -12,9 +12,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeFoodPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new SnufflingSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -28,9 +28,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeFleshFoodPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new SnufflingFleshSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -46,9 +46,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeFoodPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new SnufflingDifferencialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -62,9 +62,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeFleshFoodPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new SnufflingFleshDifferencialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
     
@@ -88,9 +88,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeFoodPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new ModerateSnufflingDifferencialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -114,9 +114,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeFleshFoodPosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new ModerateSnufflingFleshDifferencialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

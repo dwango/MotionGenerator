@@ -5,6 +5,6 @@ namespace MotionGenerator.Entity.Soul
     public interface ISoul
     {
         float Reward(State lastState, State nowState);
-        ISoulSaveData SaveAsInterface();
+        SoulSaveData SaveAsInterface();
     }
 }

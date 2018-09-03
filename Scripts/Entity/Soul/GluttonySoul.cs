@@ -24,9 +24,9 @@ namespace MotionGenerator.Entity.Soul
             }
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new GluttonySoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -47,9 +47,9 @@ namespace MotionGenerator.Entity.Soul
             }
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new EnergizeSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

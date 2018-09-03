@@ -25,6 +25,10 @@ namespace MotionGenerator.Entity.Soul
         {
         }
 
+        public TerritorySoul(TerritorySoulSaveData saveData)
+        {
+            _territoryCenter = new DenseVector(saveData.TerritoryCenter.ToArray());
+        }
 
         public override float Reward(State lastState, State nowState)
         {
@@ -36,9 +40,14 @@ namespace MotionGenerator.Entity.Soul
             return lastDistance - currentDistance;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public new TerritorySoulSaveData Save()
         {
             return new TerritorySoulSaveData(_territoryCenter);
+        }
+        
+        public override SoulSaveData SaveAsInterface()
+        {
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

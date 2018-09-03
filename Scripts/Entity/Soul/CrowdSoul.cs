@@ -9,9 +9,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeTribePosition;
         }
         
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new CrowdDifferencialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

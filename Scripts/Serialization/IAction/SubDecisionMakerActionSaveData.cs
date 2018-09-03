@@ -7,14 +7,14 @@ namespace MotionGenerator.Serialization
     public class SubDecisionMakerActionSaveData : IActionSaveData, IMotionGeneratorSerializable<SubDecisionMakerActionSaveData>
     {
         [Key(0)] public ActionBaseSaveData ActionBase { get; set; }
-        [Key(1)] public IDecisionMakerSaveData DecisionMakerSaveData { get; set; }
+        [Key(1)] public DecisionMakerSaveData DecisionMakerSaveData { get; set; }
 
         public SubDecisionMakerActionSaveData()
         {
             
         }
 
-        public SubDecisionMakerActionSaveData(ActionBaseSaveData actionBase, IDecisionMakerSaveData decisionMakerSaveData)
+        public SubDecisionMakerActionSaveData(ActionBaseSaveData actionBase, DecisionMakerSaveData decisionMakerSaveData)
         {
             DecisionMakerSaveData = decisionMakerSaveData;
             ActionBase = actionBase;

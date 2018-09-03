@@ -5,7 +5,7 @@ using MotionGenerator.Serialization;
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public class BumpingDifferenceialSoulSaveData : ISoulSaveData, IMotionGeneratorSerializable<BumpingDifferenceialSoulSaveData>
+    public class BumpingDifferencialSoulSaveData : ISoulSaveData, IMotionGeneratorSerializable<BumpingDifferencialSoulSaveData>
     {
         public ISoul Instantiate()
         {

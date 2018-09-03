@@ -14,9 +14,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeCreaturePosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new CowardSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 
@@ -32,9 +32,9 @@ namespace MotionGenerator.Entity.Soul
             return State.BasicKeys.RelativeCreaturePosition;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new CowardDiffrencialSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

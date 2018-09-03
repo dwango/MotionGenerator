@@ -18,9 +18,9 @@ namespace MotionGenerator.Entity.Soul
             return lastDistance - currentDistance;
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new NostalgiaSoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

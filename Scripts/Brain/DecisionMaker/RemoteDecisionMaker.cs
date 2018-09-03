@@ -41,12 +41,17 @@ namespace MotionGenerator
             RemoteId = saveData.RemoteId;
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new RemoteDecisionMakerSaveData Save()
         {
             return new RemoteDecisionMakerSaveData(
                 (DecisionMakerBaseSaveData) base.Save(),
                 RemoteId
             );
+        }
+
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
         public override void Init(List<IAction> actions)

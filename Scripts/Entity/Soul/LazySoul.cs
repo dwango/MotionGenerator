@@ -10,9 +10,9 @@ namespace MotionGenerator.Entity.Soul
             return -Distance(lastState[State.BasicKeys.Position], nowState[State.BasicKeys.Position]);
         }
 
-        public override ISoulSaveData SaveAsInterface()
+        public override SoulSaveData SaveAsInterface()
         {
-            return new LazySoulSaveData();
+            return new SoulSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
     }
 }

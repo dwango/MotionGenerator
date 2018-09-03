@@ -164,7 +164,7 @@ namespace MotionGenerator
             }
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new ReinforcementDecisionMakerSaveData Save()
         {
             string modelSaveDataJson = null;
             if (_model != null)
@@ -185,7 +185,7 @@ namespace MotionGenerator
                 _optimizerType,
                 _hiddenDimention,
                 SubDecisionMakers.Keys.ToArray(),
-                SubDecisionMakers.Values.Select(x => x.Save()).ToArray(),
+                SubDecisionMakers.Values.Select(x => x.SaveAsInterface()).ToArray(),
                 _keyOrder,
                 _optimizerAlpha,
                 _trainer != null
@@ -194,6 +194,11 @@ namespace MotionGenerator
                 _randomActionProbability,
                 _enableRandomForgetting
             );
+        }
+
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
         private void LoadInitialModel(int inputDimention = 6)

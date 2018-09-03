@@ -8,10 +8,12 @@ namespace MotionGenerator.Entity.Soul
     {
         public abstract float Reward(State lastState, State nowState);
 
-        public virtual ISoulSaveData SaveAsInterface()
+        public SoulBaseSaveData Save()
         {
             return new SoulBaseSaveData();
         }
+
+        public abstract SoulSaveData SaveAsInterface();
 
         protected static float Distance(Vector x, Vector y)
         {

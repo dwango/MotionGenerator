@@ -32,12 +32,14 @@ namespace MotionGenerator
         {
         }
         
-        public virtual IDecisionMakerSaveData Save()
+        public DecisionMakerBaseSaveData Save()
         {
             return new DecisionMakerBaseSaveData(
                 Actions.Select(x => x.SaveAsInterface()).ToList()
             );
         }
+
+        public abstract DecisionMakerSaveData SaveAsInterface();
 
         // new
         public virtual void Init(List<IAction> actions)

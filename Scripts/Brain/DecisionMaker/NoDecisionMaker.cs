@@ -15,13 +15,18 @@ namespace MotionGenerator
         {
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new NoDecisionMakerSaveData Save()
         {
             return new NoDecisionMakerSaveData(
                 (DecisionMakerBaseSaveData) base.Save()
             );
         }
 
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
+        }
+        
         public override void Init(List<IAction> actions)
         {
             base.Init(actions.Take(1).ToList());

@@ -18,7 +18,7 @@ namespace MotionGenerator
 
         public new SubDecisionMakerActionSaveData Save()
         {
-            return new SubDecisionMakerActionSaveData(base.Save(), DecisionMaker.Save());
+            return new SubDecisionMakerActionSaveData(base.Save(), DecisionMaker.SaveAsInterface());
         }
 
         public override ActionSaveData SaveAsInterface()

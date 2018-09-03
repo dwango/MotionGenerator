@@ -13,6 +13,6 @@ namespace MotionGenerator
         void AlterSoulWeights(float[] soulWeights);
         void SetRandomActionProbability(float probability);
         void ResetModel();
-        IDecisionMakerSaveData Save();
+        DecisionMakerSaveData SaveAsInterface();
     }
 }

@@ -26,12 +26,17 @@ namespace MotionGenerator
             _isNegative = saveData.IsNegative;
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new FollowHighestDensityDecisionMakerSaveData Save()
         {
             return new FollowHighestDensityDecisionMakerSaveData(
                 (DecisionMakerBaseSaveData) base.Save(),
                 _stateKey, _isNegative
             );
+        }
+
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
         private float CalculateDensity(Vector states, int direction, int diffuse)

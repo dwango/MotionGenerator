@@ -39,7 +39,7 @@ namespace MotionGenerator
             _emergencyEnergyRatio = saveData.EmergencyEnergyRatio;
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new HeuristicReinforcementDecisionMakerSaveData Save()
         {
             return new HeuristicReinforcementDecisionMakerSaveData((ReinforcementDecisionMakerSaveData) base.Save(),
                 _practiceDecisionMakerIndex,
@@ -50,6 +50,10 @@ namespace MotionGenerator
             );
         }
 
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
+        }
 
         public override void Init(List<IAction> actions)
         {

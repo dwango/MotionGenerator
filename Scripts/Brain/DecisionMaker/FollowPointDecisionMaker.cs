@@ -38,7 +38,7 @@ namespace MotionGenerator
             _isNegative = saveData.IsNegative;
         }
 
-        public override IDecisionMakerSaveData Save()
+        public new FollowPointDecisionMakerSaveData Save()
         {
             return new FollowPointDecisionMakerSaveData(
                 (DecisionMakerBaseSaveData) base.Save(),
@@ -46,6 +46,10 @@ namespace MotionGenerator
             );
         }
 
+        public override DecisionMakerSaveData SaveAsInterface()
+        {
+            return new DecisionMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
+        }
 
         private void Init()
         {

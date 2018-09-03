@@ -32,7 +32,7 @@ namespace MotionGenerator
         public IBrainSaveData Save()
         {
             return new BrainSaveData(
-                _decisionMaker.Save(),
+                _decisionMaker.SaveAsInterface(),
                 _sequenceMaker.SaveAsInterface(),
                 _currentAction.SaveAsInterface(),
                 _lastState.Save()
