@@ -24,92 +24,37 @@ namespace MotionGenerator.Serialization
             deserializer[typeof(T).ToString()] = func;
         }
 
+        public static void AddDeserializer<T>() where T : ISoul, new()
+        {
+            AddDeserializer<T>(_ => { return new T(); });
+        }
+
         private static void AddDefaultSerializers()
         {
-            AddDeserializer<GluttonySoul>(_ =>
-            {
-                return new GluttonySoul();
-            });
-            AddDeserializer<SnufflingSoul>(_ =>
-            {
-                return new SnufflingSoul();
-            });
-            AddDeserializer<SnufflingDifferencialSoul>(_ =>
-            {
-                return new SnufflingDifferencialSoul();
-            });
-            AddDeserializer<SnufflingFleshSoul>(_ =>
-            {
-                return new SnufflingFleshSoul();
-            });
-            AddDeserializer<SnufflingFleshDifferencialSoul>(_ =>
-            {
-                return new SnufflingFleshDifferencialSoul();
-            });
-            AddDeserializer<ShoutingLoveSoul>(_ =>
-            {
-                return new ShoutingLoveSoul();
-            });
-            AddDeserializer<ShoutingLoveDifferencialSoul>(_ =>
-            {
-                return new ShoutingLoveDifferencialSoul();
-            });
+            AddDeserializer<GluttonySoul>();
+            AddDeserializer<SnufflingSoul>();
+            AddDeserializer<SnufflingDifferencialSoul>();
+            AddDeserializer<SnufflingFleshSoul>();
+            AddDeserializer<SnufflingFleshDifferencialSoul>();
+            AddDeserializer<ShoutingLoveSoul>();
+            AddDeserializer<ShoutingLoveDifferencialSoul>();
+            AddDeserializer<NostalgiaSoul>();
+            AddDeserializer<CrowdDifferencialSoul>();
+            AddDeserializer<CowardSoul>();
+            AddDeserializer<CowardDiffrencialSoul>();
+            AddDeserializer<BumpingDifferencialSoul>();
+            AddDeserializer<LazySoul>();
+            AddDeserializer<FamiliarDiffrencialSoul>();
+            AddDeserializer<ModerateSnufflingDifferencialSoul>();
+            AddDeserializer<ModerateSnufflingFleshDifferencialSoul>();
+            AddDeserializer<ModerateFamiliarDiffrencialSoul>();
+            AddDeserializer<ModerateBumpingDifferencialSoul>();
+            AddDeserializer<AvoidObjectSoul>();
+            AddDeserializer<EnergizeSoul>();
             AddDeserializer<TerritorySoul>(baseData =>
             {
                 var saveData = MotionGeneratorSerialization.Deserialize<TerritorySoulSaveData>(baseData);
                 return new TerritorySoul(saveData);
-            });
-            AddDeserializer<NostalgiaSoul>(_ =>
-            {
-                return new NostalgiaSoul();
-            });
-            AddDeserializer<CrowdDifferencialSoul>(_ =>
-            {
-                return new CrowdDifferencialSoul();
-            });
-            AddDeserializer<CowardSoul>(_ =>
-            {
-                return new CowardSoul();
-            });
-            AddDeserializer<CowardDiffrencialSoul>(_ =>
-            {
-                return new CowardDiffrencialSoul();
-            });
-            AddDeserializer<BumpingDifferencialSoul>(_ =>
-            {
-                return new BumpingDifferencialSoul();
-            });
-            AddDeserializer<LazySoul>(_ =>
-            {
-                return new LazySoul();
-            });
-            AddDeserializer<FamiliarDiffrencialSoul>(_ =>
-            {
-                return new FamiliarDiffrencialSoul();
-            });
-            AddDeserializer<ModerateSnufflingDifferencialSoul>(_ =>
-            {
-                return new ModerateSnufflingDifferencialSoul();
-            });
-            AddDeserializer<ModerateSnufflingFleshDifferencialSoul>(_ =>
-            {
-                return new ModerateSnufflingFleshDifferencialSoul();
-            });
-            AddDeserializer<ModerateFamiliarDiffrencialSoul>(_ =>
-            {
-                return new ModerateFamiliarDiffrencialSoul();
-            });
-            AddDeserializer<ModerateBumpingDifferencialSoul>(_ =>
-            {
-                return new ModerateBumpingDifferencialSoul();
-            });
-            AddDeserializer<AvoidObjectSoul>(_ =>
-            {
-                return new AvoidObjectSoul();
-            });
-            AddDeserializer<EnergizeSoul>(_ =>
-            {
-                return new EnergizeSoul();
             });
         }
 
