@@ -8,16 +8,16 @@ namespace MotionGenerator
 {
     public abstract class SequenceMakerBase : ISequenceMaker
     {
-        protected readonly int MaxSequenceLength;
+        protected readonly float MaxSequenceLength;
         private const float MaxSequenceLengthSec = 1.2f;
         private const float MinSequenceLengthSec = 0.4f;
 
         protected SequenceMakerBase()
         {
-            var min = MinSequenceLengthSec / Time.fixedDeltaTime;
-            var max = MaxSequenceLengthSec / Time.fixedDeltaTime;
+            var min = MinSequenceLengthSec;
+            var max = MaxSequenceLengthSec;
             // Beta.Sample(2.0, 2.0) -> [0,1]
-            MaxSequenceLength = (int) Math.Ceiling(min + (max - min) * (float) Beta.Sample(2.0, 2.0));
+            MaxSequenceLength = min + (max - min) * (float) Beta.Sample(2.0, 2.0);
         }
 
         public abstract SequenceMakerSaveData SaveAsInterface();

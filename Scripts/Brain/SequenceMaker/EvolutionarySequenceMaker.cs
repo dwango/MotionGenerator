@@ -17,9 +17,9 @@ namespace MotionGenerator
         private int _manipulatableDimension;
         private List<IAction> _actions;
         private readonly ContinuousUniform _maintainRandom = new ContinuousUniform(0, 1.0, new MersenneTwister(0));
-        private int _sequenceLength;
+        private float _sequenceLength;
 
-        public EvolutionarySequenceMaker(float epsilon, int minimumCandidates, int sequenceLength = -1)
+        public EvolutionarySequenceMaker(float epsilon, int minimumCandidates, float sequenceLength = -1f)
         {
             _epsilon = epsilon;
             _minimumCandidates = minimumCandidates;
