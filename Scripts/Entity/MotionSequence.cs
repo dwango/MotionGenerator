@@ -14,6 +14,12 @@ namespace MotionGenerator
             this.time = time;
             this.value = value;
         }
+        
+        public MotionTarget(MotionTarget origin)
+        {
+            time = origin.time;
+            value = new List<float>(origin.value);
+        }
 
         public MotionTarget(MotionTargetSaveData saveData)
         {
@@ -41,7 +47,7 @@ namespace MotionGenerator
 
         public MotionSequence(MotionSequence motionSequence)
         {
-            Sequence = new List<MotionTarget>(motionSequence.Sequence);
+            Sequence = motionSequence.Sequence.Select(x => new MotionTarget(x)).ToList();
         }
 
         public MotionSequence()
