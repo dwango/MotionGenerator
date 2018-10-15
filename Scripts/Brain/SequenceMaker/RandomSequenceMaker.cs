@@ -5,6 +5,7 @@ using MathNet.Numerics.Random;
 using MathNet.Numerics.Distributions;
 using MotionGenerator.Serialization;
 using System;
+using UnityEngine.Assertions;
 
 namespace MotionGenerator
 {
@@ -17,12 +18,13 @@ namespace MotionGenerator
 
         private readonly MersenneTwister _randomGenerator;
 
-        public RandomSequenceMaker(float timeRange, float valueRange, int numControlPoints)
+        public RandomSequenceMaker(float timeRange, float valueRange, int numControlPoints, List<int> manipulatorDimensions)
         {
             _timeRange = timeRange;
             _valueRange = valueRange;
             _numControlPoints = numControlPoints;
             _randomGenerator = new MersenneTwister();
+            _outputDimentions = manipulatorDimensions.ToList();
         }
 
         public RandomSequenceMaker(RandomSequenceMaker other)
@@ -31,6 +33,15 @@ namespace MotionGenerator
             _valueRange = other._valueRange;
             _numControlPoints = other._numControlPoints;
             _outputDimentions = other._outputDimentions.ToList();
+            _randomGenerator = other._randomGenerator;
+        }
+
+        public RandomSequenceMaker(RandomSequenceMaker other, List<int> newManipulatorDimensions)
+        {
+            _timeRange = other._timeRange;
+            _valueRange = other._valueRange;
+            _numControlPoints = other._numControlPoints;
+            _outputDimentions = newManipulatorDimensions.ToList();
             _randomGenerator = other._randomGenerator;
         }
 
@@ -56,16 +67,6 @@ namespace MotionGenerator
         public override SequenceMakerSaveData SaveAsInterface()
         {
             return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
-        }
-        
-        public override void Init(List<IAction> actions, List<int> manipulationDimensions)
-        {
-            _outputDimentions = manipulationDimensions;
-        }
-
-        public override void Restore(List<IAction> actions, List<int> manipulatableDimensions)
-        {
-            this.Init(actions, manipulatableDimensions);
         }
 
         public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
@@ -138,6 +139,7 @@ namespace MotionGenerator
             var perturbation = new Normal();
             var neutralPosition = enableNutralPosision ? 1 : 0; // last element is nutral position
 
+            Assert.AreEqual(newMotionSequences.Count, originalSequences.Count);
             for (int manipulatableIndex = 0; manipulatableIndex < newMotionSequences.Count; manipulatableIndex++)
             {
                 var sequence = newMotionSequences[manipulatableIndex].Sequence;

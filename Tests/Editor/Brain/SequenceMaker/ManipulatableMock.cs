@@ -1,10 +1,16 @@
-﻿namespace MotionGenerator
+﻿using System;
+
+namespace MotionGenerator
 {
     public class ManipulatableMock
     {
         public virtual int GetManipulatableDimention()
         {
             return 3;
+        }
+        public virtual Guid GetManipulatableId()
+        {
+            return Guid.NewGuid();
         }
     }
 

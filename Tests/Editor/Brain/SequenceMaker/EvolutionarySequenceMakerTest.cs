@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MotionGenerator.Serialization;
+using System;
 
 namespace MotionGenerator
 {
@@ -16,10 +17,13 @@ namespace MotionGenerator
             var sequenceMaker = new EvolutionarySequenceMaker(0.3f, minimumCandidates: 3);
             sequenceMaker.Init(
                 dummyActions,
-                new List<int> {(new ManipulatableMock()).GetManipulatableDimention()}
+                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
+                new List<int> {new ManipulatableMock().GetManipulatableDimention()}
             );
             var copiedSequenceMaker = new EvolutionarySequenceMaker(0.3f, minimumCandidates: 3);
-            copiedSequenceMaker.Init(sequenceMaker);
+            copiedSequenceMaker.Init(sequenceMaker,
+                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
+                new List<int> {new ManipulatableMock().GetManipulatableDimention()});
 
             sequenceMaker.GenerateSequence(dummyActions[0]);
             copiedSequenceMaker.GenerateSequence(dummyActions[0]);
@@ -32,6 +36,7 @@ namespace MotionGenerator
             var sm = new EvolutionarySequenceMaker(0.3f, 3);
             sm.Init(
                 dummyActions,
+                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
                 new List<int> {(new ManipulatableMock()).GetManipulatableDimention()}
             );
 
@@ -45,44 +50,11 @@ namespace MotionGenerator
         }
 
         [Test]
-        public void AlterManipulatablesTest()
+        public void InheritManipulatorTest()
         {
-            var sm = new EvolutionarySequenceMaker(0.3f, 3);
-            sm.Init(
-                dummyActions,
-                new List<int> {(new ManipulatableMock()).GetManipulatableDimention()}
-            );
-
-            var beforeValue = sm.GenerateSequence(dummyActions[0])[0].Sequence[0].value.Count;
-
-            sm.AlterManipulatables(
-                new List<int> {(new ManipulatableMock4Dimention()).GetManipulatableDimention()}
-            );
-
-            var afterValue = sm.GenerateSequence(dummyActions[0])[0].Sequence[0].value.Count;
-            Assert.IsTrue(
-                beforeValue != afterValue);
-        }
-
-        [Test]
-        public void NeedToAlterManipulatablesTest()
-        {
-            var oldManipulatable = new List<int> {new ManipulatableMock().GetManipulatableDimention()};
-            var newManipulatable = new List<int> {new ManipulatableMock4Dimention().GetManipulatableDimention()};
-
-            var sm = new EvolutionarySequenceMaker(0.3f, 3);
-            sm.Init(
-                dummyActions,
-                oldManipulatable
-            );
-
-            Assert.IsFalse(sm.NeedToAlterManipulatables(oldManipulatable));
-            Assert.IsTrue(sm.NeedToAlterManipulatables(newManipulatable));
-
-            sm.AlterManipulatables(newManipulatable);
-
-            Assert.IsFalse(sm.NeedToAlterManipulatables(newManipulatable));
-            Assert.IsTrue(sm.NeedToAlterManipulatables(oldManipulatable));
+            InheritableSequenceMakerTestFunctions.InheritManipulatorTest(
+                new EvolutionarySequenceMaker(0.3f, 3),
+                new EvolutionarySequenceMaker(0.3f, 3));
         }
     }
 }

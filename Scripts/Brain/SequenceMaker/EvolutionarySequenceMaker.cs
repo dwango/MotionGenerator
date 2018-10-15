@@ -3,6 +3,7 @@ using System.Linq;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Random;
 using MotionGenerator.Serialization;
+using System;
 
 namespace MotionGenerator
 {
@@ -14,7 +15,6 @@ namespace MotionGenerator
         private Candidate _lastOutput;
         private Dictionary<string, List<Candidate>> _candidatesDict;
         private Dictionary<string, RandomSequenceMaker> _randomMakerDict;
-        private int _manipulatableDimension;
         private List<IAction> _actions;
         private readonly ContinuousUniform _maintainRandom = new ContinuousUniform(0, 1.0, new MersenneTwister(0));
         private float _sequenceLength;
@@ -66,16 +66,16 @@ namespace MotionGenerator
             return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
-        public override void Init(List<IAction> actions, List<int> manipulationDimensions)
+        public override void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<int> manipulationDimensions)
         {
-            _manipulatableDimension = manipulationDimensions.Sum();
+            base.Init(actions, manipulatableIdToSequenceId, manipulationDimensions);
             _actions = actions.Where(x => !(x is SubDecisionMakerAction)).ToList();
             _randomMakerDict = new Dictionary<string, RandomSequenceMaker>();
             _candidatesDict = new Dictionary<string, List<Candidate>>();
             foreach (var action in _actions)
             {
-                var rsm = new RandomSequenceMaker(_sequenceLength, 1, 3);
-                rsm.Init(new List<IAction> {action}, manipulationDimensions);
+                var rsm = new RandomSequenceMaker(_sequenceLength, 1, 3, manipulationDimensions);
+                rsm.Init(new List<IAction> {action}, manipulatableIdToSequenceId, manipulationDimensions);
                 _randomMakerDict.Add(action.Name, rsm);
 
                 var candidates = new List<Candidate>(_minimumCandidates);
@@ -88,41 +88,36 @@ namespace MotionGenerator
             }
         }
 
-        public override void Init(ISequenceMaker abstrctParent)
+        public override void Init(ISequenceMaker abstrctParent, Dictionary<Guid, int> manipulatableIdToSequenceId,
+            List<int> manipulationDimensions)
         {
+            base.Init(abstrctParent, manipulatableIdToSequenceId, manipulationDimensions);
             var parent = (EvolutionarySequenceMaker) abstrctParent;
             _actions = parent._actions;
             _epsilon = parent._epsilon;
             _minimumCandidates = parent._minimumCandidates;
-            _candidatesDict = parent._candidatesDict.ToDictionary(
-                kv => kv.Key,
-                kv => kv.Value.Select(candidate => new Candidate(candidate)).ToList()
-            );
             _randomMakerDict = parent._randomMakerDict.ToDictionary(
                 kv => kv.Key,
-                kv => new RandomSequenceMaker(kv.Value)
+                kv => new RandomSequenceMaker(kv.Value, manipulationDimensions)
+            );
+            var childSequenceIdToParentSequenceId = GenerateChildSequenceIdToParentSequenceIdMapping(
+                manipulatableIdToSequenceId, parent.ManipulatableIdToSequenceId); 
+            _candidatesDict = parent._candidatesDict.ToDictionary(
+                kv => kv.Key,
+                kv => kv.Value.Select(candidate => new Candidate(candidate, manipulationDimensions, childSequenceIdToParentSequenceId)).ToList()
             );
         }
-
-        public override void Restore(List<IAction> actions, List<int> manipulationDimensions)
+        
+        public override void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
         {
+            base.Restore(actions, manipulatableIdToSequenceId);
             _actions = actions;
             foreach (var kv in _randomMakerDict)
             {
-                kv.Value.Restore(actions, manipulationDimensions);
+                kv.Value.Restore(actions, manipulatableIdToSequenceId);
             }
         }
-
-        public override bool NeedToAlterManipulatables(List<int> manipulationDimensions)
-        {
-            return _manipulatableDimension != manipulationDimensions.Sum();
-        }
-
-        public override void AlterManipulatables(List<int> manipulationDimensions)
-        {
-            Init(_actions, manipulationDimensions);
-        }
-
+        
         public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             var candidates = _candidatesDict[action.Name];

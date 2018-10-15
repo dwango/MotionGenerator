@@ -2,7 +2,7 @@
 using MathNet.Numerics.LinearAlgebra.Double;
 using MotionGenerator.Entity.Soul;
 using NUnit.Framework;
-using UnityEngine;
+using System;
 
 namespace MotionGenerator.Tests.Editor.Brain
 {
@@ -20,6 +20,7 @@ namespace MotionGenerator.Tests.Editor.Brain
             );
             brain.Init(
                 new List<int> {(new ManipulatableMock()).GetManipulatableDimention()},
+                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
                 actions,
                 new List<ISoul>() {new GluttonySoul()}
             );

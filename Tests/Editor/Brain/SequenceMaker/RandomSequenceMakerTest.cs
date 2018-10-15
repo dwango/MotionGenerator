@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System;
 
 namespace MotionGenerator
 {
@@ -15,11 +16,12 @@ namespace MotionGenerator
             const int numControlPoints = 3;
             const int dimention = 3;
             const float maxValue = 3.0f;
-            var sequenceMaker = new RandomSequenceMaker(10, maxValue, numControlPoints);
+            var sequenceMaker = new RandomSequenceMaker(10, maxValue, numControlPoints, new List<int> {new ManipulatableMock().GetManipulatableDimention()});
 
             //Act
             sequenceMaker.Init(
                 _dummyActions,
+                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
                 new List<int> {new ManipulatableMock().GetManipulatableDimention()}
             );
             List<MotionSequence> sequenceDict = sequenceMaker.GenerateSequence(_dummyActions[0]);
@@ -40,8 +42,10 @@ namespace MotionGenerator
         [Test]
         public void DeepCopyConstructorTest()
         {
-            var sequenceMaker = new RandomSequenceMaker(10, 3.0f, 3);
-            sequenceMaker.Init(_dummyActions, new List<int> {new ManipulatableMock().GetManipulatableDimention()});
+            var sequenceMaker = new RandomSequenceMaker(10, 3.0f, 3, new List<int> {new ManipulatableMock().GetManipulatableDimention()});
+            sequenceMaker.Init(_dummyActions,
+                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
+                new List<int> {new ManipulatableMock().GetManipulatableDimention()});
             Assert.IsNotNull(new RandomSequenceMaker(sequenceMaker));
         }
     }

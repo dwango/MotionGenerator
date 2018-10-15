@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MathNet.Numerics.Distributions;
 using MotionGenerator.Serialization;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace MotionGenerator
         protected readonly float MaxSequenceLength;
         private const float MaxSequenceLengthSec = 1.2f;
         private const float MinSequenceLengthSec = 0.4f;
+        protected Dictionary<Guid, int> ManipulatableIdToSequenceId; 
 
         protected SequenceMakerBase()
         {
@@ -22,31 +24,50 @@ namespace MotionGenerator
 
         public abstract SequenceMakerSaveData SaveAsInterface();
 
-        // new
-        public abstract void Init(List<IAction> actions, List<int> manipulationDimensions);
-
-        // inherit
-        public virtual void Init(ISequenceMaker parent)
+        // new creature
+        public virtual void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<int> manipulationDimensions)
         {
-            throw new NotImplementedException();
+            ManipulatableIdToSequenceId = manipulatableIdToSequenceId;
+        }
+
+        // inherit 
+        public virtual void Init(ISequenceMaker parent, Dictionary<Guid, int> manipulatableIdToSequenceId,
+            List<int> manipulationDimensions)
+        {           
+            ManipulatableIdToSequenceId = manipulatableIdToSequenceId;
         }
 
         // load
-        public abstract void Restore(List<IAction> actions, List<int> manipulatableDimensions);
-
-        public virtual void AlterManipulatables(List<int> manipulationDimensions) 
+        public virtual void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
         {
-        }
-
-        public virtual bool NeedToAlterManipulatables(List<int> manipulationDimensions)
-        {
-            return false;
+            ManipulatableIdToSequenceId = manipulatableIdToSequenceId;
         }
 
         public abstract List<MotionSequence> GenerateSequence(IAction action, State currentState = null);
 
         public virtual void Feedback(float reward, State lastState, State currentState)
         {
+        }
+
+        protected static Dictionary<int, int> GenerateChildSequenceIdToParentSequenceIdMapping(
+            Dictionary<Guid, int> childManipulatableIdToSequenceId,
+            Dictionary<Guid, int> parentManipulatableIdToSequenceId)
+        {
+            var childSequenceIdToParentSequenceId = new Dictionary<int, int>();
+            foreach (var manipulatableId in childManipulatableIdToSequenceId.Keys)
+            {
+                const int referenceSequenceIdNotExists = -1;
+                var childSequenceId = childManipulatableIdToSequenceId[manipulatableId];
+                var parentSequenceId = parentManipulatableIdToSequenceId.ContainsKey(manipulatableId)
+                    ? parentManipulatableIdToSequenceId[manipulatableId]
+                    : referenceSequenceIdNotExists;
+
+                childSequenceIdToParentSequenceId.Add(
+                    childSequenceId,
+                    parentSequenceId);
+            }
+
+            return childSequenceIdToParentSequenceId;
         }
     }
 }

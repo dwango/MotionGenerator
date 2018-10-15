@@ -5,6 +5,7 @@ using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Random;
 using MotionGenerator.Serialization;
 using UnityEngine;
+using System;
 
 namespace MotionGenerator
 {
@@ -69,14 +70,15 @@ namespace MotionGenerator
             return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
-        public override void Init(List<IAction> actions, List<int> manipulationDimensions)
+        public override void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<int> manipulationDimensions)
         {
+            base.Init(actions, manipulatableIdToSequenceId, manipulationDimensions);
             _randomMakerDict = new Dictionary<string, RandomSequenceMaker>();
             _candidatesDict = new Dictionary<string, List<Candidate>>();
             foreach (var action in actions)
             {
-                var rsm = new RandomSequenceMaker(MaxSequenceLength, 1.0f, _numControlPoints);
-                rsm.Init(actions, manipulationDimensions);
+                var rsm = new RandomSequenceMaker(MaxSequenceLength, 1.0f, _numControlPoints, manipulationDimensions);
+                rsm.Init(actions, manipulatableIdToSequenceId, manipulationDimensions);
                 _randomMakerDict.Add(action.Name, rsm);
                 _candidatesDict.Add(action.Name, new List<Candidate>()
                 {
@@ -85,13 +87,14 @@ namespace MotionGenerator
             }
         }
 
-        public override void Restore(List<IAction> actions, List<int> manipulationDimensions)
+        public override void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
         {
+            base.Restore(actions, manipulatableIdToSequenceId);
             _lastAction = actions.Find(x => x.Name == _lastAction.Name);
             foreach (var kv in _randomMakerDict)
             {
                 var action = actions.Find(x => x.Name == kv.Key);
-                kv.Value.Restore(new List<IAction> {action}, manipulationDimensions);
+                kv.Value.Restore(new List<IAction> {action}, manipulatableIdToSequenceId);
             }
         }
 

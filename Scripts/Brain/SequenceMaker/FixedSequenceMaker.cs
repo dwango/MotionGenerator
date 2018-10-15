@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MotionGenerator.Serialization;
+using System;
 
 namespace MotionGenerator
 {
@@ -32,12 +33,9 @@ namespace MotionGenerator
                 )));
         }
 
-        public override void Init(List<IAction> actions, List<int> manipulationDimensions)
+        public override void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
         {
-        }
-
-        public override void Restore(List<IAction> actions, List<int> manipulationDimensions)
-        {
+            base.Restore(actions, manipulatableIdToSequenceId);
             _motionDict = _motionDict.ToDictionary(
                 kv => actions.Find(x => x.Name == kv.Key).Name,
                 kv => kv.Value);

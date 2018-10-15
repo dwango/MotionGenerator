@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.Distributions;
 using MotionGenerator.Serialization;
+using UnityEngine;
 
 namespace MotionGenerator
 {
-    public class Candidate
+    public class Candidate: CandidateBase
     {
         public float mean;
         private float _meanSquare; // mean of square
@@ -25,14 +26,15 @@ namespace MotionGenerator
             variance = float.MaxValue; // to be choosen
         }
 
-        public Candidate(Candidate other) // deep copy
+        public Candidate(Candidate other, List<int> manipulationDimensions, Dictionary<int, int> childSequenceIdToParentSequenceId) // deep copy
         {
             mean = other.mean;
             _meanSquare = other._meanSquare;
             variance = other.variance;
             std = other.std;
-            numTried = other.numTried;
-            value = other.value.ToList();
+            numTried = Mathf.Min(other.numTried, 1);
+            value = CopyValueWithSequenceMapping(other.value, manipulationDimensions,
+                childSequenceIdToParentSequenceId);
         }
 
         public Candidate(CandidateSaveData saveData)

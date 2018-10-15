@@ -39,42 +39,39 @@ namespace MotionGenerator
             );
         }
 
-        public void Init(List<int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul)
+        public void Init(List<int> manipulatableDimensions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<IAction> actions, List<ISoul> soul)
         {
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Init(actions);
-            _sequenceMaker.Init(actions, manipulatableDimensions);
+            _sequenceMaker.Init(actions, manipulatableIdToSequenceId, manipulatableDimensions);
             _souls = soul;
             _currentAction = actions[0];
         }
 
-        public void Init(List<int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul, IBrain iParentBrain)
+        public void Init(List<int> manipulatableDimensions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<IAction> actions, List<ISoul> soul,
+            IBrain iParentBrain)
         {
             var parentBrain = (Brain) iParentBrain;
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Init(parentBrain._decisionMaker);
-            _sequenceMaker.Init(parentBrain._sequenceMaker);
+            _sequenceMaker.Init(parentBrain._sequenceMaker, manipulatableIdToSequenceId, manipulatableDimensions);
             _souls = soul;
             _currentAction = actions[0];
-            
-            if (_sequenceMaker.NeedToAlterManipulatables(manipulatableDimensions))
-            {
-                _sequenceMaker.AlterManipulatables(manipulatableDimensions);
-            }
         }
 
         /// <summary>
         /// セーブデータからのロード時に、デシリアライズデータだけでは
         /// 足りない情報を復帰させる
         /// </summary>
-        public void Restore(List<int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul)
+        public void Restore(List<int> manipulatableDimensions,
+            Dictionary<Guid, int> manipulatableIdToSequenceId, List<IAction> actions, List<ISoul> soul)
         {
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Restore(actions);
-            _sequenceMaker.Restore(actions, manipulatableDimensions);
+            _sequenceMaker.Restore(actions, manipulatableIdToSequenceId);
             _souls = soul;
             _currentAction = actions.Find(x => x.Name == _currentAction.Name);
         }
