@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.Distributions;
-using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {
@@ -33,7 +30,8 @@ namespace MotionGenerator
                         // forceは0次元目という決め打ちなので
                         initialValues[0] = InitialForceValue;
                         
-                        initialMotionTarget.Add(new MotionTarget(time, initialValues));
+                        // TODO: RandomSequenceMakerに統合する。それまでは0.5秒で生成する
+                        initialMotionTarget.Add(new MotionTarget(time * 0.5f, initialValues));
                     }
                     motionSequence = new MotionSequence(initialMotionTarget);
                 }
