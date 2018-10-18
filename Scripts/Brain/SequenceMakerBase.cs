@@ -12,7 +12,7 @@ namespace MotionGenerator
         protected readonly float MaxSequenceLength;
         private const float MaxSequenceLengthSec = 1.2f;
         private const float MinSequenceLengthSec = 0.4f;
-        protected Dictionary<Guid, int> ManipulatableIdToSequenceId; 
+        protected Dictionary<Guid, int> ManipulatableDimensions; 
 
         protected SequenceMakerBase()
         {
@@ -25,49 +25,28 @@ namespace MotionGenerator
         public abstract SequenceMakerSaveData SaveAsInterface();
 
         // new creature
-        public virtual void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<int> manipulationDimensions)
+        public virtual void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableDimensions)
         {
-            ManipulatableIdToSequenceId = manipulatableIdToSequenceId;
+            ManipulatableDimensions = manipulatableDimensions;
         }
 
         // inherit 
-        public virtual void Init(ISequenceMaker parent, Dictionary<Guid, int> manipulatableIdToSequenceId,
-            List<int> manipulationDimensions)
+        public virtual void Init(ISequenceMaker parent,
+            Dictionary<Guid, int> manipulatableDimensions = null)
         {           
-            ManipulatableIdToSequenceId = manipulatableIdToSequenceId;
+            ManipulatableDimensions = manipulatableDimensions;
         }
 
         // load
         public virtual void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
         {
-            ManipulatableIdToSequenceId = manipulatableIdToSequenceId;
+            ManipulatableDimensions = manipulatableIdToSequenceId;
         }
 
-        public abstract List<MotionSequence> GenerateSequence(IAction action, State currentState = null);
+        public abstract Dictionary<Guid, MotionSequence> GenerateSequence(IAction action, State currentState = null);
 
         public virtual void Feedback(float reward, State lastState, State currentState)
         {
-        }
-
-        protected static Dictionary<int, int> GenerateChildSequenceIdToParentSequenceIdMapping(
-            Dictionary<Guid, int> childManipulatableIdToSequenceId,
-            Dictionary<Guid, int> parentManipulatableIdToSequenceId)
-        {
-            var childSequenceIdToParentSequenceId = new Dictionary<int, int>();
-            foreach (var manipulatableId in childManipulatableIdToSequenceId.Keys)
-            {
-                const int referenceSequenceIdNotExists = -1;
-                var childSequenceId = childManipulatableIdToSequenceId[manipulatableId];
-                var parentSequenceId = parentManipulatableIdToSequenceId.ContainsKey(manipulatableId)
-                    ? parentManipulatableIdToSequenceId[manipulatableId]
-                    : referenceSequenceIdNotExists;
-
-                childSequenceIdToParentSequenceId.Add(
-                    childSequenceId,
-                    parentSequenceId);
-            }
-
-            return childSequenceIdToParentSequenceId;
         }
     }
 }

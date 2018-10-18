@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using MessagePack;
 using MotionGenerator.Serialization;
@@ -10,7 +11,7 @@ namespace MotionGenerator.Serialization
         [Key(0)] public float TimeRange { get; set; }
         [Key(1)] public float ValueRange { get; set; }
         [Key(2)] public int NumControlPoints { get; set; }
-        [Key(3)] public List<int> OutputDimentions { get; set; }
+        [Key(3)] public Dictionary<Guid, int> OutputDimentions { get; set; }
 
         public RandomSequenceMakerSaveData()
         {
@@ -18,7 +19,7 @@ namespace MotionGenerator.Serialization
         }
 
         public RandomSequenceMakerSaveData(float timeRange,
-            float valueRange, int numControlPoints, List<int> outputDimentions)
+            float valueRange, int numControlPoints, Dictionary<Guid, int> outputDimentions)
         {
             TimeRange = timeRange;
             ValueRange = valueRange;

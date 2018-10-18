@@ -16,18 +16,18 @@ namespace MotionGenerator
             const int numControlPoints = 3;
             const int dimention = 3;
             const float maxValue = 3.0f;
-            var sequenceMaker = new RandomSequenceMaker(10, maxValue, numControlPoints, new List<int> {new ManipulatableMock().GetManipulatableDimention()});
+            var sequenceMaker = new RandomSequenceMaker(10, maxValue, numControlPoints,
+                new Dictionary<Guid, int> {{Guid.NewGuid(), (new ManipulatableMock()).GetManipulatableDimention()}});
 
             //Act
             sequenceMaker.Init(
                 _dummyActions,
-                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
-                new List<int> {new ManipulatableMock().GetManipulatableDimention()}
+                new Dictionary<Guid, int> {{Guid.NewGuid(), new ManipulatableMock().GetManipulatableDimention()}}
             );
-            List<MotionSequence> sequenceDict = sequenceMaker.GenerateSequence(_dummyActions[0]);
+            var sequenceDict = sequenceMaker.GenerateSequence(_dummyActions[0]);
 
             //Assert
-            MotionSequence sequence = sequenceDict.First();
+            var sequence = sequenceDict.Values.First();
             Assert.AreEqual(sequence[0].value.Count, numControlPoints);
             Assert.AreEqual(sequence[0].value.Count, dimention);
             Assert.Less(sequence[0].time, sequence[1].time);
@@ -42,10 +42,10 @@ namespace MotionGenerator
         [Test]
         public void DeepCopyConstructorTest()
         {
-            var sequenceMaker = new RandomSequenceMaker(10, 3.0f, 3, new List<int> {new ManipulatableMock().GetManipulatableDimention()});
+            var sequenceMaker = new RandomSequenceMaker(10, 3.0f, 3, 
+                new Dictionary<Guid, int> {{Guid.NewGuid(), new ManipulatableMock().GetManipulatableDimention()}});
             sequenceMaker.Init(_dummyActions,
-                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
-                new List<int> {new ManipulatableMock().GetManipulatableDimention()});
+                new Dictionary<Guid, int> {{Guid.NewGuid(), new ManipulatableMock().GetManipulatableDimention()}});
             Assert.IsNotNull(new RandomSequenceMaker(sequenceMaker));
         }
     }

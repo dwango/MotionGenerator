@@ -14,17 +14,18 @@ namespace MotionGenerator
         private readonly float _timeRange;
         private readonly float _valueRange;
         private readonly int _numControlPoints;
-        private List<int> _outputDimentions;
+        private Dictionary<Guid, int> _outputDimentions;
 
         private readonly MersenneTwister _randomGenerator;
 
-        public RandomSequenceMaker(float timeRange, float valueRange, int numControlPoints, List<int> manipulatorDimensions)
+        public RandomSequenceMaker(float timeRange, float valueRange, int numControlPoints,
+            Dictionary<Guid, int> manipulatorDimensions)
         {
             _timeRange = timeRange;
             _valueRange = valueRange;
             _numControlPoints = numControlPoints;
             _randomGenerator = new MersenneTwister();
-            _outputDimentions = manipulatorDimensions.ToList();
+            _outputDimentions = manipulatorDimensions.ToDictionary(x=>x.Key,x=>x.Value);
         }
 
         public RandomSequenceMaker(RandomSequenceMaker other)
@@ -32,16 +33,16 @@ namespace MotionGenerator
             _timeRange = other._timeRange;
             _valueRange = other._valueRange;
             _numControlPoints = other._numControlPoints;
-            _outputDimentions = other._outputDimentions.ToList();
+            _outputDimentions = other._outputDimentions.ToDictionary(x=>x.Key,x=>x.Value);
             _randomGenerator = other._randomGenerator;
         }
 
-        public RandomSequenceMaker(RandomSequenceMaker other, List<int> newManipulatorDimensions)
+        public RandomSequenceMaker(RandomSequenceMaker other, Dictionary<Guid, int> newManipulatorDimensions)
         {
             _timeRange = other._timeRange;
             _valueRange = other._valueRange;
             _numControlPoints = other._numControlPoints;
-            _outputDimentions = newManipulatorDimensions.ToList();
+            _outputDimentions = newManipulatorDimensions.ToDictionary(x=>x.Key,x=>x.Value);
             _randomGenerator = other._randomGenerator;
         }
 
@@ -50,7 +51,7 @@ namespace MotionGenerator
             _timeRange = saveData.TimeRange;
             _valueRange = saveData.ValueRange;
             _numControlPoints = saveData.NumControlPoints;
-            _outputDimentions = saveData.OutputDimentions;
+            _outputDimentions = saveData.OutputDimentions.ToDictionary(x=>x.Key,x=>x.Value);
             _randomGenerator = new MersenneTwister();
         }
 
@@ -60,7 +61,7 @@ namespace MotionGenerator
                 _timeRange,
                 _valueRange,
                 _numControlPoints,
-                _outputDimentions
+                _outputDimentions.ToDictionary(x=>x.Key,x=>x.Value)
             );
         }
 
@@ -69,12 +70,20 @@ namespace MotionGenerator
             return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
+        public override Dictionary<Guid, MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
-            return _outputDimentions.Select(x => GenerateSynchronousSingleSequence(action, x)).ToList();
+            var dict = new Dictionary<Guid, MotionSequence>();
+            foreach (var item in _outputDimentions)
+            {
+                var dimension = item.Value;
+                var manipulatableId = item.Key;
+                dict.Add(manipulatableId, GenerateSynchronousSingleSequence(action, dimension));
+            }
+
+            return dict;
         }
 
-        public MotionSequence GenerateSingleSequence(IAction action, int dimention)
+        public MotionSequence GenerateSingleSequence(List<Guid> manipulatableIds, IAction action, int dimention)
         {
             var timeUniform = new ContinuousUniform(0, _timeRange, _randomGenerator);
             var times = Enumerable.Range(0, _numControlPoints)
@@ -128,9 +137,9 @@ namespace MotionGenerator
             return new MotionSequence(sequence);
         }
 
-        public List<MotionSequence> GenerateSimilarSequence(
+        public Dictionary<Guid, MotionSequence> GenerateSimilarSequence(
             IAction action,
-            List<MotionSequence> originalSequences,
+            Dictionary<Guid, MotionSequence> originalSequences,
             float noiseRate,
             bool enableNutralPosision
         )
@@ -140,11 +149,11 @@ namespace MotionGenerator
             var neutralPosition = enableNutralPosision ? 1 : 0; // last element is nutral position
 
             Assert.AreEqual(newMotionSequences.Count, originalSequences.Count);
-            for (int manipulatableIndex = 0; manipulatableIndex < newMotionSequences.Count; manipulatableIndex++)
+            foreach (var manipulatableIndex in newMotionSequences.Keys)
             {
                 var sequence = newMotionSequences[manipulatableIndex].Sequence;
                 var original = originalSequences[manipulatableIndex].Sequence;
-                UnityEngine.Assertions.Assert.AreEqual(sequence.Count, original.Count);
+                Assert.AreEqual(sequence.Count, original.Count);
                 for (int i = 0; i < sequence.Count - neutralPosition; i++)
                 {
                     // EvolutionarySequenceMakerでControlPointのTimeに摂動を加える
@@ -170,15 +179,15 @@ namespace MotionGenerator
             return newMotionSequences;
         }
 
-        public List<MotionSequence> ChangeTimeScale(
+        public Dictionary<Guid, MotionSequence> ChangeTimeScale(
             IAction action,
             float ratio,
-            List<MotionSequence> originalSequences
+            Dictionary<Guid, MotionSequence> originalSequences
         )
         {
             var newMotionSequences = GenerateSequence(action); // TODO deep copy
 
-            for (int manipulatableIndex = 0; manipulatableIndex < newMotionSequences.Count; manipulatableIndex++)
+            foreach (var manipulatableIndex in newMotionSequences.Keys)
             {
                 var sequence = newMotionSequences[manipulatableIndex].Sequence;
                 var original = originalSequences[manipulatableIndex].Sequence;

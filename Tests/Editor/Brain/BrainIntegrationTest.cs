@@ -19,8 +19,7 @@ namespace MotionGenerator.Tests.Editor.Brain
                 sequenceMaker
             );
             brain.Init(
-                new List<int> {(new ManipulatableMock()).GetManipulatableDimention()},
-                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
+                new Dictionary<Guid, int> {{Guid.NewGuid(), (new ManipulatableMock()).GetManipulatableDimention()}},
                 actions,
                 new List<ISoul>() {new GluttonySoul()}
             );

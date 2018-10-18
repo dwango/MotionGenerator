@@ -14,9 +14,9 @@ namespace MotionGenerator
         public float variance;
         public float std;
         public float numTried;
-        public List<MotionSequence> value;
+        public Dictionary<Guid, MotionSequence> value;
 
-        public Candidate(List<MotionSequence> value)
+        public Candidate(Dictionary<Guid, MotionSequence> value)
         {
             this.value = value;
             numTried = 0;
@@ -26,15 +26,14 @@ namespace MotionGenerator
             variance = float.MaxValue; // to be choosen
         }
 
-        public Candidate(Candidate other, List<int> manipulationDimensions, Dictionary<int, int> childSequenceIdToParentSequenceId) // deep copy
+        public Candidate(Candidate other, Dictionary<Guid, int> manipulatableDimensions) // deep copy
         {
             mean = other.mean;
             _meanSquare = other._meanSquare;
             variance = other.variance;
             std = other.std;
             numTried = Mathf.Min(other.numTried, 1);
-            value = CopyValueWithSequenceMapping(other.value, manipulationDimensions,
-                childSequenceIdToParentSequenceId);
+            value = CopyValueWithSequenceMapping(other.value, manipulatableDimensions);
         }
 
         public Candidate(CandidateSaveData saveData)
@@ -44,7 +43,7 @@ namespace MotionGenerator
             variance = saveData.Variance;
             std = saveData.Std;
             numTried = saveData.NumTried;
-            value = saveData.Value.Select(x => new MotionSequence(x)).ToList();
+            value = saveData.Value.ToDictionary(x => x.Key, x => new MotionSequence(x.Value));
         }
 
         public CandidateSaveData Save()
@@ -55,7 +54,7 @@ namespace MotionGenerator
                 variance,
                 std,
                 numTried,
-                value.Select(x => x.Save()).ToArray()
+                value.ToDictionary(x => x.Key, x => x.Value.Save())
             );
         }
 

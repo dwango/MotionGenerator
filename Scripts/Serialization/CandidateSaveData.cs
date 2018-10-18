@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MessagePack;
 using MotionGenerator.Serialization;
 
@@ -12,7 +13,7 @@ namespace MotionGenerator.Serialization
         [Key(2)] public float Variance { get; set; }
         [Key(3)] public float Std { get; set; }
         [Key(4)] public float NumTried { get; set; }
-        [Key(5)] public MotionSequenceSaveData[] Value { get; set; }
+        [Key(5)] public Dictionary<Guid, MotionSequenceSaveData> Value { get; set; }
 
         public CandidateSaveData()
         {
@@ -20,7 +21,7 @@ namespace MotionGenerator.Serialization
         }
 
         public CandidateSaveData(float mean, float meanSquare, float variance, float std, float numTried,
-            MotionSequenceSaveData[] value)
+            Dictionary<Guid, MotionSequenceSaveData> value)
         {
             Mean = mean;
             MeanSquare = meanSquare;

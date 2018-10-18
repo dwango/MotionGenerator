@@ -39,24 +39,24 @@ namespace MotionGenerator
             );
         }
 
-        public void Init(List<int> manipulatableDimensions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<IAction> actions, List<ISoul> soul)
+        public void Init(Dictionary<Guid, int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul)
         {
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Init(actions);
-            _sequenceMaker.Init(actions, manipulatableIdToSequenceId, manipulatableDimensions);
+            _sequenceMaker.Init(actions, manipulatableDimensions);
             _souls = soul;
             _currentAction = actions[0];
         }
 
-        public void Init(List<int> manipulatableDimensions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<IAction> actions, List<ISoul> soul,
+        public void Init(Dictionary<Guid, int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul,
             IBrain iParentBrain)
         {
             var parentBrain = (Brain) iParentBrain;
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Init(parentBrain._decisionMaker);
-            _sequenceMaker.Init(parentBrain._sequenceMaker, manipulatableIdToSequenceId, manipulatableDimensions);
+            _sequenceMaker.Init((List<IAction>) parentBrain._sequenceMaker, manipulatableDimensions);
             _souls = soul;
             _currentAction = actions[0];
         }
@@ -65,13 +65,12 @@ namespace MotionGenerator
         /// セーブデータからのロード時に、デシリアライズデータだけでは
         /// 足りない情報を復帰させる
         /// </summary>
-        public void Restore(List<int> manipulatableDimensions,
-            Dictionary<Guid, int> manipulatableIdToSequenceId, List<IAction> actions, List<ISoul> soul)
+        public void Restore(Dictionary<Guid, int> manipulatableDimensions, List<IAction> actions, List<ISoul> soul)
         {
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Restore(actions);
-            _sequenceMaker.Restore(actions, manipulatableIdToSequenceId);
+            _sequenceMaker.Restore(actions, manipulatableDimensions);
             _souls = soul;
             _currentAction = actions.Find(x => x.Name == _currentAction.Name);
         }
@@ -81,7 +80,7 @@ namespace MotionGenerator
             _decisionMaker.AlterSoulWeights(soulWeights);
         }
 
-        public List<MotionSequence> GenerateMotionSequence(State state)
+        public Dictionary<Guid, MotionSequence> GenerateMotionSequence(State state)
         {
             // feed back
             if (_lastState.Count != 0)

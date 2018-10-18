@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MotionGenerator
@@ -11,21 +12,23 @@ namespace MotionGenerator
         const float InitialValue = 0.5f; // 値域が[0,1]なので中心の0.5
         const float InitialForceValue = 0.5f; // 値域が[0,1]なので中心の0.5
         
-        protected List<MotionSequence> CopyValueWithSequenceMapping(List<MotionSequence> originalValue, List<int> manipulationDimensions, Dictionary<int, int> childSequenceIdToParentSequenceId)
+        protected Dictionary<Guid, MotionSequence> CopyValueWithSequenceMapping(
+            Dictionary<Guid, MotionSequence> originalValue,
+            Dictionary<Guid, int> newmanipulatableDimensions)
         {
-            var value = new List<MotionSequence>();
-            var sequenceCount = manipulationDimensions.Count;
-            for (var sequenceId = 0; sequenceId < sequenceCount; sequenceId++)
+            var manipulatableIds = newmanipulatableDimensions.Keys;
+            var value = new Dictionary<Guid, MotionSequence>();
+            var sequenceCount = newmanipulatableDimensions.Count;
+            foreach (var manipulatableId in manipulatableIds)
             {
-                var referenceSequenceId = childSequenceIdToParentSequenceId[sequenceId];
-                MotionSequence motionSequence = null;
-                if (referenceSequenceId == -1)
+                MotionSequence motionSequence;
+                if (!originalValue.ContainsKey(manipulatableId))
                 {
                     // 親には存在しない新しいManipulatorなので、初期値を設定
                     var initialMotionTarget = new List<MotionTarget>();
                     foreach (var time in InitialControlPointTimes)
                     {
-                        var initialValues = Enumerable.Repeat(InitialValue, manipulationDimensions[sequenceId]).ToList();
+                        var initialValues = Enumerable.Repeat(InitialValue, newmanipulatableDimensions[manipulatableId]).ToList();
                         
                         // forceは0次元目という決め打ちなので
                         initialValues[0] = InitialForceValue;
@@ -38,9 +41,9 @@ namespace MotionGenerator
                 else
                 {
                     // 親のManipulatorのSequenceをコピー
-                    motionSequence = new MotionSequence(originalValue[referenceSequenceId]);
+                    motionSequence = new MotionSequence(originalValue[manipulatableId]);
                 }
-                value.Add(motionSequence);
+                value.Add(manipulatableId, motionSequence);
             }
 
             return value;

@@ -14,16 +14,15 @@ namespace MotionGenerator
         [Test]
         public void DeepCopyTest()
         {
+            var manipulatableId = Guid.NewGuid();
             var sequenceMaker = new EvolutionarySequenceMaker(0.3f, minimumCandidates: 3);
             sequenceMaker.Init(
                 dummyActions,
-                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
-                new List<int> {new ManipulatableMock().GetManipulatableDimention()}
+                new Dictionary<Guid, int> {{manipulatableId, new ManipulatableMock().GetManipulatableDimention()}}
             );
             var copiedSequenceMaker = new EvolutionarySequenceMaker(0.3f, minimumCandidates: 3);
             copiedSequenceMaker.Init(sequenceMaker,
-                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
-                new List<int> {new ManipulatableMock().GetManipulatableDimention()});
+                new Dictionary<Guid, int> {{manipulatableId, new ManipulatableMock().GetManipulatableDimention()}});
 
             sequenceMaker.GenerateSequence(dummyActions[0]);
             copiedSequenceMaker.GenerateSequence(dummyActions[0]);
@@ -36,8 +35,7 @@ namespace MotionGenerator
             var sm = new EvolutionarySequenceMaker(0.3f, 3);
             sm.Init(
                 dummyActions,
-                new Dictionary<Guid, int> {{new ManipulatableMock().GetManipulatableId(), 0}},
-                new List<int> {(new ManipulatableMock()).GetManipulatableDimention()}
+                new Dictionary<Guid, int> {{Guid.NewGuid(), (new ManipulatableMock()).GetManipulatableDimention()}}
             );
 
             var src = sm.Save();

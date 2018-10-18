@@ -7,9 +7,9 @@ namespace MotionGenerator
 {
     public class FixedSequenceMaker : SequenceMakerBase
     {
-        private Dictionary<string, List<MotionSequence>> _motionDict;
+        private Dictionary<string, Dictionary<Guid, MotionSequence>> _motionDict;
 
-        public FixedSequenceMaker(Dictionary<string, List<MotionSequence>> motionDict)
+        public FixedSequenceMaker(Dictionary<string, Dictionary<Guid, MotionSequence>> motionDict)
         {
             _motionDict = motionDict;
         }
@@ -18,7 +18,7 @@ namespace MotionGenerator
         {
             _motionDict = saveData.MotionDict.ToDictionary(
                 kv => kv.Key,
-                kv => kv.Value.Select(x => new MotionSequence(x)).ToList()
+                kv => kv.Value.ToDictionary(x=>x.Key , x => new MotionSequence(x.Value))
             );
         }
 
@@ -28,7 +28,7 @@ namespace MotionGenerator
                 new FixedSequenceMakerSaveData(
                     _motionDict.ToDictionary(
                         kv => kv.Key,
-                        kv => kv.Value.Select(x => x.Save()).ToList()
+                        kv => kv.Value.ToDictionary(x=>x.Key , x => x.Value.Save())
                     )
                 )));
         }
@@ -41,7 +41,7 @@ namespace MotionGenerator
                 kv => kv.Value);
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
+        public override Dictionary<Guid, MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             return _motionDict[action.Name];
         }

@@ -70,17 +70,17 @@ namespace MotionGenerator
             return new SequenceMakerSaveData(GetType(), MotionGeneratorSerialization.Serialize(Save()));
         }
 
-        public override void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId, List<int> manipulationDimensions)
+        public override void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableDimensions)
         {
-            base.Init(actions, manipulatableIdToSequenceId, manipulationDimensions);
+            base.Init(actions, manipulatableDimensions);
             _randomMakerDict = new Dictionary<string, RandomSequenceMaker>();
             _candidatesDict = new Dictionary<string, List<Candidate>>();
             foreach (var action in actions)
             {
-                var rsm = new RandomSequenceMaker(MaxSequenceLength, 1.0f, _numControlPoints, manipulationDimensions);
-                rsm.Init(actions, manipulatableIdToSequenceId, manipulationDimensions);
+                var rsm = new RandomSequenceMaker(MaxSequenceLength, 1.0f, _numControlPoints, manipulatableDimensions);
+                rsm.Init(actions, manipulatableDimensions);
                 _randomMakerDict.Add(action.Name, rsm);
-                _candidatesDict.Add(action.Name, new List<Candidate>()
+                _candidatesDict.Add(action.Name, new List<Candidate>
                 {
                     new Candidate(rsm.GenerateSequence(action))
                 });
@@ -98,7 +98,7 @@ namespace MotionGenerator
             }
         }
 
-        public override List<MotionSequence> GenerateSequence(IAction action, State currentState = null)
+        public override Dictionary<Guid, MotionSequence> GenerateSequence(IAction action, State currentState = null)
         {
             var candidates = _candidatesDict[action.Name];
             var epsilonUniform = new ContinuousUniform(0, 1.0, RandomGenerator);
@@ -145,7 +145,8 @@ namespace MotionGenerator
             // avoid zero stickness
 			foreach (var _ in Enumerable.Range(0, _minimumCandidates - candidates.Count))
             {
-                candidates.Add(new Candidate(randomMaker.GenerateSequence(action)));
+                // TODO
+                //candidates.Add(new Candidate(randomMaker.GenerateSequence(action)));
             }
             //ShowCandidates(action);
         }
