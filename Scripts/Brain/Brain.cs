@@ -56,7 +56,7 @@ namespace MotionGenerator
             if (actions.Count == 0)
                 throw new ArgumentException("need at least one action");
             _decisionMaker.Init(parentBrain._decisionMaker);
-            _sequenceMaker.Init((List<IAction>) parentBrain._sequenceMaker, manipulatableDimensions);
+            _sequenceMaker.Init(parentBrain._sequenceMaker, manipulatableDimensions);
             _souls = soul;
             _currentAction = actions[0];
         }
