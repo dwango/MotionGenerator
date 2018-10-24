@@ -161,6 +161,12 @@ namespace MotionGenerator
 
         public override void Feedback(float reward, State lastState, State currentState)
         {
+            if (currentState.ContainsKey(State.BasicKeys.AvoidSequenceMakerFeedback) &&
+                currentState.GetAsFloat(State.BasicKeys.AvoidSequenceMakerFeedback) > 0.0001f)
+            {
+                return;
+            }
+
             if (!(_lastOutput == null))
             {
 //				Debug.Log (string.Format("lastAction:{0}, reward: {1}", lastAction.name, reward));

@@ -46,7 +46,8 @@ namespace MotionGenerator
             public const string RelativeObservedTilePosition = "RelativeObservedTilePosition";
             public const string WalkMotion = "WalkMotion";
             public const string BodyScale = "BodyScale";
-            public const string AvoidLearning = "AvoidLearning"; // なにかのセンサーの状態が大きく変わって，学習をやめたい時 > 0
+            public const string AvoidLearning = "AvoidLearning"; // なにかのセンサーの状態が大きく変わって，DM学習をやめたい時 > 0
+            public const string AvoidSequenceMakerFeedback = "AvoidSequenceMakerFeedback"; // なにかのセンサーの状態が大きく変わって，SM学習をやめたい時 > 0
         }
 
         public const float Inf = 1000f;
