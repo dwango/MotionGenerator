@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MotionGenerator
 {
-    public class Candidate: CandidateBase
+    public class Candidate
     {
         public float mean;
         private float _meanSquare; // mean of square
@@ -33,7 +33,7 @@ namespace MotionGenerator
             variance = other.variance;
             std = other.std;
             numTried = Mathf.Min(other.numTried, 1);
-            value = CopyValueWithSequenceMapping(other.value, manipulatableDimensions);
+            value = RandomSequenceMaker.CopyValueWithSequenceMapping(other.value, manipulatableDimensions);
         }
 
         public Candidate(CandidateSaveData saveData)

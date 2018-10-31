@@ -137,6 +137,22 @@ namespace MotionGenerator
             return new MotionSequence(sequence);
         }
 
+        public static MotionSequence QuietMotionSequence(int dimension, float force, float timeRange)
+        {
+            const float InitialValue = 0.5f; // 値域が[0,1]なので中心の0.5
+            
+            var initialMotionTarget = new List<MotionTarget>();
+            foreach (var time in InitialTimes)
+            {
+                var initialValues = Enumerable.Repeat(InitialValue, dimension).ToList();
+                
+                // forceは0次元目という決め打ちなので
+                initialValues[0] = force;
+                initialMotionTarget.Add(new MotionTarget(time * timeRange, initialValues));
+            }
+            return new MotionSequence(initialMotionTarget);
+        }
+
         public Dictionary<Guid, MotionSequence> GenerateSimilarSequence(
             IAction action,
             Dictionary<Guid, MotionSequence> originalSequences,
@@ -201,6 +217,36 @@ namespace MotionGenerator
                 }
             }
             return newMotionSequences;
+        }
+        
+        public static Dictionary<Guid, MotionSequence> CopyValueWithSequenceMapping(
+            Dictionary<Guid, MotionSequence> originalValue,
+            Dictionary<Guid, int> newManipulatableDimensions)
+        {
+            const float InitialForceValue = 0.5f; //値域が[0,1]なので中心の0.5
+            var motionDuration = originalValue.Values.Max(x => x.GetDuration());
+            var timeRange = motionDuration;
+                        
+            var manipulatableIds = newManipulatableDimensions.Keys;
+            var value = new Dictionary<Guid, MotionSequence>();
+            foreach (var manipulatableId in manipulatableIds)
+            {
+                MotionSequence motionSequence;
+                if (!originalValue.ContainsKey(manipulatableId))
+                {
+                    motionSequence = RandomSequenceMaker.QuietMotionSequence(
+                        newManipulatableDimensions[manipulatableId],
+                        InitialForceValue, timeRange);
+                }
+                else
+                {
+                    // 親のManipulatorのSequenceをコピー
+                    motionSequence = new MotionSequence(originalValue[manipulatableId]);
+                }
+                value.Add(manipulatableId, motionSequence);
+            }
+
+            return value;
         }
     }
 }
