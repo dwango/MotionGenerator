@@ -28,15 +28,15 @@ namespace MotionGenerator
 
             //Assert
             var sequence = sequenceDict.Values.First();
-            Assert.AreEqual(sequence[0].value.Count, numControlPoints);
-            Assert.AreEqual(sequence[0].value.Count, dimention);
-            Assert.Less(sequence[0].time, sequence[1].time);
-            Assert.Less(sequence[0].value[0], maxValue);
-            Assert.Less(sequence[0].value[1], maxValue);
-            Assert.Less(sequence[0].value[2], maxValue);
-            Assert.Greater(sequence[0].value[0], 0);
-            Assert.Greater(sequence[0].value[1], 0);
-            Assert.Greater(sequence[0].value[2], 0);
+            Assert.AreEqual(sequence[0].Values.Length, numControlPoints);
+            Assert.AreEqual(sequence[0].Values.Length, dimention);
+            Assert.Less(sequence[0].Time, sequence[1].Time);
+            Assert.Less(sequence[0].Values[0], maxValue);
+            Assert.Less(sequence[0].Values[1], maxValue);
+            Assert.Less(sequence[0].Values[2], maxValue);
+            Assert.Greater(sequence[0].Values[0], 0);
+            Assert.Greater(sequence[0].Values[1], 0);
+            Assert.Greater(sequence[0].Values[2], 0);
         }
 
         [Test]

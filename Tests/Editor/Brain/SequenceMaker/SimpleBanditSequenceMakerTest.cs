@@ -19,7 +19,7 @@ namespace MotionGenerator
             );
             var sequence = sequenceMaker.GenerateSequence(dummyActions[0]);
             Assert.AreEqual(sequence.Count, 1);
-            Assert.AreEqual(sequence.First().Value[0].value.Count, (new ManipulatableMock()).GetManipulatableDimention());
+            Assert.AreEqual(sequence.First().Value[0].Values.Length, (new ManipulatableMock()).GetManipulatableDimention());
         }
     }
 }

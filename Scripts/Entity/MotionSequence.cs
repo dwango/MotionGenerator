@@ -4,50 +4,65 @@ using MotionGenerator.Serialization;
 
 namespace MotionGenerator
 {
-    public class MotionTarget
+    public struct MotionTarget
     {
-        public float time;
-        public List<float> value;
+        public float Time;
+        public float[] Values;
 
-        public MotionTarget(float time, List<float> value)
+        public MotionTarget(float time, List<float> values)
         {
-            this.time = time;
-            this.value = value;
+            Time = time;
+            Values = values.ToArray();
         }
-        
+
+        public MotionTarget(float time, float[] values)
+        {
+            Time = time;
+            Values = values.ToArray();
+        }
+
         public MotionTarget(MotionTarget origin)
         {
-            time = origin.time;
-            value = new List<float>(origin.value);
+            Time = origin.Time;
+            Values = origin.Values.ToArray();
         }
 
         public MotionTarget(MotionTargetSaveData saveData)
         {
-            time = saveData.Time;
-            value = saveData.Value;
+            Time = saveData.Time;
+            Values = saveData.Values.ToArray();
         }
 
         public MotionTargetSaveData Save()
         {
             return new MotionTargetSaveData(
-                time,
-                value
+                Time,
+                Values.ToArray()
             );
         }
     }
 
     public class MotionSequence
     {
-        public List<MotionTarget> Sequence;
+        public MotionTarget[] Sequences;
+        private int _index;
 
-        public MotionSequence(List<MotionTarget> sequence)
+        public MotionSequence(List<MotionTarget> sequences)
         {
-            Sequence = sequence;
+            Sequences = sequences.ToArray();
+            _index = 0;
+        }
+
+        public MotionSequence(MotionTarget[] sequences)
+        {
+            Sequences = sequences;
+            _index = 0;
         }
 
         public MotionSequence(MotionSequence motionSequence)
         {
-            Sequence = motionSequence.Sequence.Select(x => new MotionTarget(x)).ToList();
+            Sequences = motionSequence.Sequences.ToArray();
+            _index = 0;
         }
 
         public MotionSequence()
@@ -57,27 +72,38 @@ namespace MotionGenerator
 
         public MotionSequence(MotionSequenceSaveData saveData)
         {
-            Sequence = saveData.Sequence.Select(x => new MotionTarget(x)).ToList();
+            Sequences = saveData.Sequences.Select(x => new MotionTarget(x)).ToArray();
+            _index = saveData.Index;
         }
 
         public MotionSequenceSaveData Save()
         {
             return new MotionSequenceSaveData(
-                Sequence.Select(x => x.Save()).ToList()
+                Sequences.Select(x => x.Save()).ToArray(),
+                _index
             );
         }
 
         public MotionTarget this[int i]
         {
-            get
-            {
-                return Sequence [i];
-            }
+            get { return Sequences[i]; }
         }
+        
+        public MotionTarget CurrentSequence()
+        {
+            return Sequences[_index];
+        }
+
+        public bool Next()
+        {
+            ++_index;
+            return _index == Sequences.Length ? false : true;
+        }
+        
 
         public float GetDuration()
         {
-            return Sequence.Last().time;
+            return Sequences[Sequences.Length - 1].Time;
         }
     }
 }

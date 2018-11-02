@@ -1,22 +1,17 @@
-using System.Collections.Generic;
 using MessagePack;
-using MotionGenerator.Serialization;
 
 namespace MotionGenerator.Serialization
 {
     [MessagePackObject]
-    public sealed class MotionSequenceSaveData : IMotionGeneratorSerializable<MotionSequenceSaveData>
+    public struct MotionSequenceSaveData : IMotionGeneratorSerializable<MotionSequenceSaveData>
     {
-        [Key(0)] public List<MotionTargetSaveData> Sequence { get; set; }
+        [Key(0)] public MotionTargetSaveData[] Sequences { get; set; }
+        [Key(1)] public int Index { get; set; }
 
-        public MotionSequenceSaveData()
+        public MotionSequenceSaveData(MotionTargetSaveData[] sequences, int index)
         {
-            
-        }
-
-        public MotionSequenceSaveData(List<MotionTargetSaveData> sequence)
-        {
-            Sequence = sequence;
+            Sequences = sequences;
+            Index = index;
         }
     }
 }

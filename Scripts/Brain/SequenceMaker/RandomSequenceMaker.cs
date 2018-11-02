@@ -25,7 +25,7 @@ namespace MotionGenerator
             _valueRange = valueRange;
             _numControlPoints = numControlPoints;
             _randomGenerator = new MersenneTwister();
-            _outputDimentions = manipulatorDimensions.ToDictionary(x=>x.Key,x=>x.Value);
+            _outputDimentions = manipulatorDimensions.ToDictionary(x => x.Key, x => x.Value);
         }
 
         public RandomSequenceMaker(RandomSequenceMaker other)
@@ -33,7 +33,7 @@ namespace MotionGenerator
             _timeRange = other._timeRange;
             _valueRange = other._valueRange;
             _numControlPoints = other._numControlPoints;
-            _outputDimentions = other._outputDimentions.ToDictionary(x=>x.Key,x=>x.Value);
+            _outputDimentions = other._outputDimentions.ToDictionary(x => x.Key, x => x.Value);
             _randomGenerator = other._randomGenerator;
         }
 
@@ -42,7 +42,7 @@ namespace MotionGenerator
             _timeRange = other._timeRange;
             _valueRange = other._valueRange;
             _numControlPoints = other._numControlPoints;
-            _outputDimentions = newManipulatorDimensions.ToDictionary(x=>x.Key,x=>x.Value);
+            _outputDimentions = newManipulatorDimensions.ToDictionary(x => x.Key, x => x.Value);
             _randomGenerator = other._randomGenerator;
         }
 
@@ -51,7 +51,7 @@ namespace MotionGenerator
             _timeRange = saveData.TimeRange;
             _valueRange = saveData.ValueRange;
             _numControlPoints = saveData.NumControlPoints;
-            _outputDimentions = saveData.OutputDimentions.ToDictionary(x=>x.Key,x=>x.Value);
+            _outputDimentions = saveData.OutputDimentions.ToDictionary(x => x.Key, x => x.Value);
             _randomGenerator = new MersenneTwister();
         }
 
@@ -61,7 +61,7 @@ namespace MotionGenerator
                 _timeRange,
                 _valueRange,
                 _numControlPoints,
-                _outputDimentions.ToDictionary(x=>x.Key,x=>x.Value)
+                _outputDimentions.ToDictionary(x => x.Key, x => x.Value)
             );
         }
 
@@ -121,35 +121,38 @@ namespace MotionGenerator
             // 位相にノイズを入れる
             var offset = Mathf.PI * (uniform.Sample() > 0.5 ? 1 : 0);
 
-            var sequence = new List<MotionTarget>();
-            foreach (var time in InitialTimes)
+            var sequence = new MotionTarget[InitialTimes.Length];
+            for (var i = 0; i < InitialTimes.Length; i++)
             {
-                var values = new List<float> {InitialForce};
-                for (var d = values.Count; d < dimention; d++)
+                var values = new float[dimention];
+                values[0] = InitialForce;
+                for (var d = 1; d < dimention; d++)
                 {
                     // control point value
-                    var radian = time * 2f * Mathf.PI + offset;
-                    var value = 0.5f + ValueRangeRatio * Mathf.Sin(radian) / 2f; // [0,1]に正規化
-                    values.Add(value);
+                    var radian = InitialTimes[i] * 2f * Mathf.PI + offset;
+                    values[d] = 0.5f + ValueRangeRatio * Mathf.Sin(radian) / 2f; // [0,1]に正規化;
                 }
-                sequence.Add(new MotionTarget(time * _timeRange, values));
+
+                sequence[i] = new MotionTarget(InitialTimes[i] * _timeRange, values);
             }
+
             return new MotionSequence(sequence);
         }
 
         public static MotionSequence QuietMotionSequence(int dimension, float force, float timeRange)
         {
             const float InitialValue = 0.5f; // 値域が[0,1]なので中心の0.5
-            
+
             var initialMotionTarget = new List<MotionTarget>();
             foreach (var time in InitialTimes)
             {
                 var initialValues = Enumerable.Repeat(InitialValue, dimension).ToList();
-                
+
                 // forceは0次元目という決め打ちなので
                 initialValues[0] = force;
                 initialMotionTarget.Add(new MotionTarget(time * timeRange, initialValues));
             }
+
             return new MotionSequence(initialMotionTarget);
         }
 
@@ -167,31 +170,36 @@ namespace MotionGenerator
             Assert.AreEqual(newMotionSequences.Count, originalSequences.Count);
             foreach (var manipulatableIndex in newMotionSequences.Keys)
             {
-                var sequence = newMotionSequences[manipulatableIndex].Sequence;
-                var original = originalSequences[manipulatableIndex].Sequence;
-                Assert.AreEqual(sequence.Count, original.Count);
-                for (int i = 0; i < sequence.Count - neutralPosition; i++)
+                var sequence = newMotionSequences[manipulatableIndex].Sequences;
+                var original = originalSequences[manipulatableIndex].Sequences;
+                Assert.AreEqual(sequence.Length, original.Length);
+                for (int i = 0; i < sequence.Length - neutralPosition; i++)
                 {
                     // EvolutionarySequenceMakerでControlPointのTimeに摂動を加える
-                    sequence[i].time = original[i].time +
+                    var newSequence = new MotionTarget(original[i]);
+                    newSequence.Time = original[i].Time +
                                        (float) perturbation.Sample() * noiseRate * 0.01f;
-                    if (i + 1 < sequence.Count)
+                    if (i + 1 < sequence.Length)
                     {
-                        sequence[i].time = Mathf.Min(sequence[i].time, sequence[i + 1].time);
-                    }
-                    if (i == 0)
-                    {
-                        sequence[i].time = Mathf.Max(sequence[i].time, 0);
+                        newSequence.Time = Mathf.Min(newSequence.Time, newSequence.Time);
                     }
 
-                    for (int j = 0; j < sequence[i].value.Count; j++)
+                    if (i == 0)
                     {
-                        sequence[i].value[j] = original[i].value[j] +
-                                               (float) perturbation.Sample() * noiseRate;
-                        sequence[i].value[j] = Mathf.Clamp(sequence[i].value[j], 0f, 1f);
+                        newSequence.Time = Mathf.Max(newSequence.Time, 0);
                     }
+
+                    for (int j = 0; j < newSequence.Values.Length; j++)
+                    {
+                        newSequence.Values[j] = original[i].Values[j] +
+                                                (float) perturbation.Sample() * noiseRate;
+                        newSequence.Values[j] = Mathf.Clamp(newSequence.Values[j], 0f, 1f);
+                    }
+
+                    sequence[i] = newSequence;
                 }
             }
+
             return newMotionSequences;
         }
 
@@ -205,20 +213,19 @@ namespace MotionGenerator
 
             foreach (var manipulatableIndex in newMotionSequences.Keys)
             {
-                var sequence = newMotionSequences[manipulatableIndex].Sequence;
-                var original = originalSequences[manipulatableIndex].Sequence;
-                for (int i = 0; i < sequence.Count; i++)
+                var sequence = newMotionSequences[manipulatableIndex].Sequences;
+                var original = originalSequences[manipulatableIndex].Sequences;
+                for (int i = 0; i < sequence.Length; i++)
                 {
-                    sequence[i].time = original[i].time * ratio;
-                    for (int j = 0; j < sequence[i].value.Count; j++)
-                    {
-                        sequence[i].value[j] = original[i].value[j];
-                    }
+                    var newSequence = new MotionTarget(original[i]);
+                    newSequence.Time = original[i].Time * ratio;
+                    sequence[i] = newSequence;
                 }
             }
+
             return newMotionSequences;
         }
-        
+
         public static Dictionary<Guid, MotionSequence> CopyValueWithSequenceMapping(
             Dictionary<Guid, MotionSequence> originalValue,
             Dictionary<Guid, int> newManipulatableDimensions)
@@ -226,7 +233,7 @@ namespace MotionGenerator
             const float InitialForceValue = 0.5f; //値域が[0,1]なので中心の0.5
             var motionDuration = originalValue.Values.Max(x => x.GetDuration());
             var timeRange = motionDuration;
-                        
+
             var manipulatableIds = newManipulatableDimensions.Keys;
             var value = new Dictionary<Guid, MotionSequence>();
             foreach (var manipulatableId in manipulatableIds)
@@ -243,6 +250,7 @@ namespace MotionGenerator
                     // 親のManipulatorのSequenceをコピー
                     motionSequence = new MotionSequence(originalValue[manipulatableId]);
                 }
+
                 value.Add(manipulatableId, motionSequence);
             }
 

@@ -21,16 +21,16 @@ namespace MotionGenerator
             var src = new MotionSequence(new List<MotionTarget> {a, b});
             var dst = new MotionSequence(MotionGeneratorSerialization.DeepClone(src.Save()));
             
-            Assert.AreEqual(src.Sequence.Count, dst.Sequence.Count);
-            for (int n = 0; n < src.Sequence.Count; ++n)
+            Assert.AreEqual(src.Sequences.Length, dst.Sequences.Length);
+            for (int n = 0; n < src.Sequences.Length; ++n)
             {
                 var s = src[n];
                 var d = dst[n];
-                Assert.AreEqual(s.time, d.time);
-                Assert.AreEqual(s.value.Count, d.value.Count);
-                for (int m = 0; m < s.value.Count; ++m)
+                Assert.AreEqual(s.Time, d.Time);
+                Assert.AreEqual(s.Values.Length, d.Values.Length);
+                for (int m = 0; m < s.Values.Length; ++m)
                 {
-                    Assert.AreEqual(s.value[m], d.value[m]);
+                    Assert.AreEqual(s.Values[m], d.Values[m]);
                 }
             }
         }
