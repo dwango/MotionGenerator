@@ -7,7 +7,7 @@ namespace MotionGenerator
     public struct MotionTarget
     {
         public float Time;
-        public float[] Values;
+        public readonly float[] Values;
 
         public MotionTarget(float time, List<float> values)
         {
@@ -18,7 +18,7 @@ namespace MotionGenerator
         public MotionTarget(float time, float[] values)
         {
             Time = time;
-            Values = values.ToArray();
+            Values = values;
         }
 
         public MotionTarget(MotionTarget origin)
@@ -44,7 +44,7 @@ namespace MotionGenerator
 
     public class MotionSequence
     {
-        public MotionTarget[] Sequences;
+        public readonly MotionTarget[] Sequences;
         private int _index;
 
         public MotionSequence(List<MotionTarget> sequences)
@@ -84,11 +84,8 @@ namespace MotionGenerator
             );
         }
 
-        public MotionTarget this[int i]
-        {
-            get { return Sequences[i]; }
-        }
-        
+        public MotionTarget this[int i] => Sequences[i];
+
         public MotionTarget CurrentSequence()
         {
             return Sequences[_index];
@@ -97,9 +94,9 @@ namespace MotionGenerator
         public bool Next()
         {
             ++_index;
-            return _index == Sequences.Length ? false : true;
+            return _index != Sequences.Length;
         }
-        
+
 
         public float GetDuration()
         {
