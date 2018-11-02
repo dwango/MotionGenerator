@@ -12,7 +12,6 @@ namespace MotionGenerator.Serialization
         [Key(2)] public ActionSaveData LastAction { get; set; }
         [Key(3)] public CandidateSaveData LastOutput { get; set; }
         [Key(4)] public Dictionary<string, List<CandidateSaveData>> CandidatesDict { get; set; }
-        [Key(5)] public Dictionary<string, RandomSequenceMakerSaveData> RandomMakerDict { get; set; }
 
         public EvolutionarySequenceMakerSaveData()
         {
@@ -20,15 +19,13 @@ namespace MotionGenerator.Serialization
 
         public EvolutionarySequenceMakerSaveData(float epsilon,
             int minimumCandidates, ActionSaveData lastAction, CandidateSaveData lastOutput,
-            Dictionary<string, List<CandidateSaveData>> candidatesDict,
-            Dictionary<string, RandomSequenceMakerSaveData> randomMakerDict)
+            Dictionary<string, List<CandidateSaveData>> candidatesDict)
         {
             Epsilon = epsilon;
             MinimumCandidates = minimumCandidates;
             LastAction = lastAction;
             LastOutput = lastOutput;
             CandidatesDict = candidatesDict;
-            RandomMakerDict = randomMakerDict;
         }
 
         public EvolutionarySequenceMaker Instantiate()

@@ -14,7 +14,6 @@ namespace MotionGenerator
         private IAction _lastAction;
         private Candidate _lastOutput;
         private Dictionary<string, List<Candidate>> _candidatesDict;
-        private Dictionary<string, RandomSequenceMaker> _randomMakerDict;
         private List<IAction> _actions;
         private readonly ContinuousUniform _maintainRandom = new ContinuousUniform(0, 1.0, new MersenneTwister(0));
         private float _sequenceLength;
@@ -31,6 +30,7 @@ namespace MotionGenerator
             {
                 _sequenceLength = sequenceLength;
             }
+
             _lastAction = new GoForwardCoordinateAction("");
             _lastOutput = new Candidate(new Dictionary<Guid, MotionSequence>());
         }
@@ -45,8 +45,6 @@ namespace MotionGenerator
             _candidatesDict =
                 saveData.CandidatesDict.ToDictionary(kv => kv.Key,
                     kv => kv.Value.Select(x => new Candidate(x)).ToList());
-            _randomMakerDict =
-                saveData.RandomMakerDict.ToDictionary(kv => kv.Key, kv => new RandomSequenceMaker(kv.Value));
         }
 
         public EvolutionarySequenceMakerSaveData Save()
@@ -56,8 +54,7 @@ namespace MotionGenerator
                 _minimumCandidates,
                 _lastAction.SaveAsInterface(),
                 _lastOutput.Save(),
-                _candidatesDict.ToDictionary(kv => kv.Key, kv => kv.Value.Select(x => x.Save()).ToList()),
-                _randomMakerDict.ToDictionary(kv => kv.Key, kv => kv.Value.Save())
+                _candidatesDict.ToDictionary(kv => kv.Key, kv => kv.Value.Select(x => x.Save()).ToList())
             );
         }
 
@@ -70,13 +67,11 @@ namespace MotionGenerator
         {
             base.Init(actions, manipulatableDimensions);
             _actions = actions.Where(x => !(x is SubDecisionMakerAction)).ToList();
-            _randomMakerDict = new Dictionary<string, RandomSequenceMaker>();
             _candidatesDict = new Dictionary<string, List<Candidate>>();
             foreach (var action in _actions)
             {
                 var rsm = new RandomSequenceMaker(_sequenceLength, 1, 3, manipulatableDimensions);
                 rsm.Init(new List<IAction> {action}, manipulatableDimensions);
-                _randomMakerDict.Add(action.Name, rsm);
 
                 var candidates = new List<Candidate>(_minimumCandidates);
                 for (var i = 0; i < candidates.Capacity; i++)
@@ -86,7 +81,6 @@ namespace MotionGenerator
 
                 _candidatesDict.Add(action.Name, candidates);
             }
-            
         }
 
         public override void Init(ISequenceMaker abstrctParent,
@@ -97,24 +91,16 @@ namespace MotionGenerator
             _actions = parent._actions;
             _epsilon = parent._epsilon;
             _minimumCandidates = parent._minimumCandidates;
-            _randomMakerDict = parent._randomMakerDict.ToDictionary(
-                kv => kv.Key,
-                kv => new RandomSequenceMaker(kv.Value, manipulatableDimensions)
-            );
             _candidatesDict = parent._candidatesDict.ToDictionary(
                 kv => kv.Key,
                 kv => kv.Value.Select(candidate => new Candidate(candidate, manipulatableDimensions)).ToList()
             );
         }
-        
+
         public override void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
         {
             base.Restore(actions, manipulatableIdToSequenceId);
             _actions = actions;
-            foreach (var kv in _randomMakerDict)
-            {
-                kv.Value.Restore(actions, manipulatableIdToSequenceId);
-            }
         }
 
         public override Dictionary<Guid, MotionSequence> GenerateSequence(IAction action, State currentState = null)
@@ -125,9 +111,8 @@ namespace MotionGenerator
             return _lastOutput.value;
         }
 
-        void Maintain(IAction action)
+        private void Maintain(IAction action)
         {
-            var randomMaker = _randomMakerDict[action.Name];
             var candidates = _candidatesDict[action.Name];
 
             if (_maintainRandom.Sample() < _epsilon)
@@ -137,13 +122,13 @@ namespace MotionGenerator
                 candidates.RemoveAt(0); // delete a worst candidate
                 Candidate maxCandidate = candidates[candidates.Count - 1];
                 candidates.Add(
-                    new Candidate(randomMaker.GenerateSimilarSequence(action, maxCandidate.value, _epsilon, true)));
+                    new Candidate(RandomSequenceMaker.GenerateSimilarSequence(maxCandidate.value, _epsilon, true)));
 
                 _candidatesDict[action.Name] = candidates;
             }
         }
 
-        Candidate SelectByExpect(List<Candidate> candidates)
+        private Candidate SelectByExpect(List<Candidate> candidates)
         {
             Candidate curiousCandidate = candidates[0];
             foreach (var candiate in candidates)
