@@ -176,15 +176,14 @@ namespace MotionGenerator
                 for (int i = 0; i < sequence.Length - neutralPosition; i++)
                 {
                     // EvolutionarySequenceMakerでControlPointのTimeに摂動を加える
-                    var newSequence = new MotionTarget(original[i]);
+                    var newSequence = new MotionTarget(sequence[i]);
                     newSequence.Time = original[i].Time +
                                        (float) perturbation.Sample() * noiseRate * 0.01f;
                     if (i + 1 < sequence.Length)
                     {
-                        newSequence.Time = Mathf.Min(newSequence.Time, newSequence.Time);
+                        newSequence.Time = Mathf.Min(newSequence.Time, sequence[i + 1].Time);
                     }
-
-                    if (i == 0)
+                    else if (i == 0)
                     {
                         newSequence.Time = Mathf.Max(newSequence.Time, 0);
                     }
