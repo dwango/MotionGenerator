@@ -163,6 +163,7 @@ namespace MotionGenerator
         public static Dictionary<Guid, MotionSequence> GenerateSimilarSequence(
             Dictionary<Guid, MotionSequence> originalSequences,
             float noiseRate,
+            float timeRatio,
             bool enableNutralPosision
         )
         {
@@ -187,7 +188,7 @@ namespace MotionGenerator
                         newTime = Mathf.Max(newTime, 0);
                     }
 
-                    sequence[i].Time = newTime;
+                    sequence[i].Time = newTime * timeRatio;
 
                     for (int j = 0; j < sequence[i].Values.Length; j++)
                     {
@@ -198,18 +199,6 @@ namespace MotionGenerator
             }
 
             return newMotionSequences;
-        }
-
-        public static void ChangeTimeScale(float ratio, Dictionary<Guid, MotionSequence> sequences)
-        {
-            foreach (var manipulatableIndex in sequences.Keys)
-            {
-                var sequence = sequences[manipulatableIndex].Sequences;
-                for (int i = 0; i < sequence.Length; i++)
-                {
-                    sequence[i].Time *= ratio;
-                }
-            }
         }
 
         public static Dictionary<Guid, MotionSequence> CopyValueWithSequenceMapping(

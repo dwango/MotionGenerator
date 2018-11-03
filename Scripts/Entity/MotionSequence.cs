@@ -21,23 +21,17 @@ namespace MotionGenerator
             Values = values;
         }
 
-        public MotionTarget(MotionTarget origin)
-        {
-            Time = origin.Time;
-            Values = origin.Values.ToArray();
-        }
-
         public MotionTarget(MotionTargetSaveData saveData)
         {
             Time = saveData.Time;
-            Values = saveData.Values.ToArray();
+            Values = saveData.Values;
         }
 
         public MotionTargetSaveData Save()
         {
             return new MotionTargetSaveData(
                 Time,
-                Values.ToArray()
+                Values
             );
         }
     }
@@ -65,8 +59,7 @@ namespace MotionGenerator
             _index = 0;
         }
 
-        public MotionSequence()
-            : this(new List<MotionTarget>())
+        public MotionSequence() : this(new MotionTarget[0])
         {
         }
 
