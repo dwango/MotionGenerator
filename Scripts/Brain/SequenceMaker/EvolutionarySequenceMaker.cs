@@ -14,7 +14,6 @@ namespace MotionGenerator
         private IAction _lastAction;
         private Candidate _lastOutput;
         private Dictionary<string, List<Candidate>> _candidatesDict;
-        private List<IAction> _actions;
         private readonly ContinuousUniform _maintainRandom = new ContinuousUniform(0, 1.0, new MersenneTwister(0));
         private float _sequenceLength;
 
@@ -66,9 +65,9 @@ namespace MotionGenerator
         public override void Init(List<IAction> actions, Dictionary<Guid, int> manipulatableDimensions)
         {
             base.Init(actions, manipulatableDimensions);
-            _actions = actions.Where(x => !(x is SubDecisionMakerAction)).ToList();
+            var actionsList = actions.Where(x => !(x is SubDecisionMakerAction)).ToList();
             _candidatesDict = new Dictionary<string, List<Candidate>>();
-            foreach (var action in _actions)
+            foreach (var action in actionsList)
             {
                 var rsm = new RandomSequenceMaker(_sequenceLength, 1, 3, manipulatableDimensions);
                 rsm.Init(new List<IAction> {action}, manipulatableDimensions);
@@ -88,19 +87,12 @@ namespace MotionGenerator
         {
             base.Init(abstrctParent, manipulatableDimensions);
             var parent = (EvolutionarySequenceMaker) abstrctParent;
-            _actions = parent._actions;
             _epsilon = parent._epsilon;
             _minimumCandidates = parent._minimumCandidates;
             _candidatesDict = parent._candidatesDict.ToDictionary(
                 kv => kv.Key,
                 kv => kv.Value.Select(candidate => new Candidate(candidate, manipulatableDimensions)).ToList()
             );
-        }
-
-        public override void Restore(List<IAction> actions, Dictionary<Guid, int> manipulatableIdToSequenceId)
-        {
-            base.Restore(actions, manipulatableIdToSequenceId);
-            _actions = actions;
         }
 
         public override Dictionary<Guid, MotionSequence> GenerateSequence(IAction action, State currentState = null)

@@ -11,7 +11,7 @@ namespace MotionGenerator
     public class RandomSequenceMaker : SequenceMakerBase
     {
         private const float InitialForceValue = 0.5f; //値域が[0,1]なので中心の0.5
- 
+
         private readonly float _timeRange;
         private readonly float _valueRange;
         private readonly int _numControlPoints;
@@ -143,12 +143,11 @@ namespace MotionGenerator
         public static MotionSequence QuietMotionSequence(int dimension, float force, float timeRange)
         {
             var initialMotionTarget = new List<MotionTarget>();
+            var initialValues = Enumerable.Repeat(InitialForceValue, dimension).ToArray();
+            // forceは0次元目という決め打ちなので
+            initialValues[0] = force;
             foreach (var time in InitialTimes)
             {
-                var initialValues = Enumerable.Repeat(InitialForceValue, dimension).ToArray();
-
-                // forceは0次元目という決め打ちなので
-                initialValues[0] = force;
                 initialMotionTarget.Add(new MotionTarget(time * timeRange, initialValues));
             }
 
@@ -177,24 +176,24 @@ namespace MotionGenerator
                 for (int i = 0; i < sequence.Length - neutralPosition; i++)
                 {
                     // EvolutionarySequenceMakerでControlPointのTimeに摂動を加える
-                    var newSequence = new MotionTarget(sequence[i]);
-                    newSequence.Time = sequence[i].Time + (float) perturbation.Sample() * noiseRate * 0.01f;
+                    var newTime = sequence[i].Time + (float) perturbation.Sample() * noiseRate * 0.01f;
                     if (i + 1 < sequence.Length)
                     {
-                        newSequence.Time = Mathf.Min(newSequence.Time, sequence[i + 1].Time);
+                        newTime = Mathf.Min(newTime, sequence[i + 1].Time);
                     }
-                    else if (i == 0)
+                    
+                    if (i == 0)
                     {
-                        newSequence.Time = Mathf.Max(newSequence.Time, 0);
+                        newTime = Mathf.Max(newTime, 0);
                     }
 
-                    for (int j = 0; j < newSequence.Values.Length; j++)
+                    sequence[i].Time = newTime;
+
+                    for (int j = 0; j < sequence[i].Values.Length; j++)
                     {
-                        newSequence.Values[j] = Mathf.Clamp(sequence[i].Values[j] +
+                        sequence[i].Values[j] = Mathf.Clamp(sequence[i].Values[j] +
                                                             (float) perturbation.Sample() * noiseRate, 0f, 1f);
                     }
-
-                    sequence[i] = newSequence;
                 }
             }
 
@@ -208,9 +207,7 @@ namespace MotionGenerator
                 var sequence = sequences[manipulatableIndex].Sequences;
                 for (int i = 0; i < sequence.Length; i++)
                 {
-                    var newSequence = new MotionTarget(sequence[i]);
-                    newSequence.Time = sequence[i].Time * ratio;
-                    sequence[i] = newSequence;
+                    sequence[i].Time *= ratio;
                 }
             }
         }
