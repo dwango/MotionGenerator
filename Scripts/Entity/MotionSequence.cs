@@ -21,6 +21,12 @@ namespace MotionGenerator
             Values = values;
         }
 
+        public MotionTarget(MotionTarget origin)
+        {
+            Time = origin.Time;
+            Values = origin.Values.ToArray();
+        }
+
         public MotionTarget(MotionTargetSaveData saveData)
         {
             Time = saveData.Time;
@@ -53,9 +59,9 @@ namespace MotionGenerator
             _index = 0;
         }
 
-        public MotionSequence(MotionSequence motionSequence)
+        public MotionSequence(MotionSequence origin)
         {
-            Sequences = motionSequence.Sequences.ToArray();
+            Sequences = origin.Sequences.Select(x => new MotionTarget(x)).ToArray(); // DeepClone
             _index = 0;
         }
 
