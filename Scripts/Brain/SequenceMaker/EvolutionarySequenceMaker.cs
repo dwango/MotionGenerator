@@ -112,8 +112,8 @@ namespace MotionGenerator
                 Candidate maxCandidate = newCandidates[newCandidates.Count - 1];
                 // replace a worst candidate
                 newCandidates[0] =
-                    new Candidate(RandomSequenceMaker.GenerateSimilarSequence(maxCandidate.value, _epsilon,
-                        timeRatio: 1f, enableNeutralPosision: false));
+                    new Candidate(
+                        RandomSequenceMaker.GenerateSimilarSequence(maxCandidate.value, _epsilon, timeRatio: 1f));
 
                 _candidatesDict[action.Name] = newCandidates;
             }

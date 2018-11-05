@@ -163,18 +163,16 @@ namespace MotionGenerator
         public static Dictionary<Guid, MotionSequence> GenerateSimilarSequence(
             Dictionary<Guid, MotionSequence> originalSequences,
             float noiseRate,
-            float timeRatio,
-            bool enableNeutralPosision
+            float timeRatio
         )
         {
             var newMotionSequences = CloneSequence(originalSequences);
             var perturbation = new Normal();
-            var neutralPosition = enableNeutralPosision ? 1 : 0; // last element is neutral position
 
             foreach (var manipulatableIndex in newMotionSequences.Keys)
             {
                 var sequence = newMotionSequences[manipulatableIndex].Sequences;
-                for (int i = 0; i < sequence.Length - neutralPosition; i++)
+                for (int i = 0; i < sequence.Length; i++)
                 {
                     // EvolutionarySequenceMakerでControlPointのTimeに摂動を加える
                     var newTime = sequence[i].Time + (float) perturbation.Sample() * noiseRate * 0.01f;
