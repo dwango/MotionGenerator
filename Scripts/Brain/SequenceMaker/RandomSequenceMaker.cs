@@ -164,12 +164,12 @@ namespace MotionGenerator
             Dictionary<Guid, MotionSequence> originalSequences,
             float noiseRate,
             float timeRatio,
-            bool enableNutralPosision
+            bool enableNeutralPosision
         )
         {
             var newMotionSequences = CloneSequence(originalSequences);
             var perturbation = new Normal();
-            var neutralPosition = enableNutralPosision ? 1 : 0; // last element is neutral position
+            var neutralPosition = enableNeutralPosision ? 1 : 0; // last element is neutral position
 
             foreach (var manipulatableIndex in newMotionSequences.Keys)
             {
