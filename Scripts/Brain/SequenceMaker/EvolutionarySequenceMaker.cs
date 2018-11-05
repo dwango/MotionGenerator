@@ -105,18 +105,17 @@ namespace MotionGenerator
 
         private void Maintain(IAction action)
         {
-            var candidates = _candidatesDict[action.Name];
-
             if (_maintainRandom.Sample() < _epsilon)
             {
-                candidates = candidates.OrderBy(o => o.mean).ToList();
+                var newCandidates = _candidatesDict[action.Name].OrderBy(o => o.mean).ToList();
 
-                candidates.RemoveAt(0); // delete a worst candidate
-                Candidate maxCandidate = candidates[candidates.Count - 1];
-                candidates.Add(
-                    new Candidate(RandomSequenceMaker.GenerateSimilarSequence(maxCandidate.value, _epsilon, 1f, true)));
+                Candidate maxCandidate = newCandidates[newCandidates.Count - 1];
+                // replace a worst candidate
+                newCandidates[0] =
+                    new Candidate(RandomSequenceMaker.GenerateSimilarSequence(maxCandidate.value, _epsilon,
+                        timeRatio: 1f, enableNeutralPosision: false));
 
-                _candidatesDict[action.Name] = candidates;
+                _candidatesDict[action.Name] = newCandidates;
             }
         }
 
