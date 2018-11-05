@@ -143,11 +143,11 @@ namespace MotionGenerator
         public static MotionSequence QuietMotionSequence(int dimension, float force, float timeRange)
         {
             var initialMotionTarget = new List<MotionTarget>();
-            var initialValues = Enumerable.Repeat(InitialForceValue, dimension).ToArray();
-            // forceは0次元目という決め打ちなので
-            initialValues[0] = force;
             foreach (var time in InitialTimes)
             {
+                var initialValues = Enumerable.Repeat(InitialForceValue, dimension).ToArray();
+                // forceは0次元目という決め打ちなので
+                initialValues[0] = force;
                 initialMotionTarget.Add(new MotionTarget(time * timeRange, initialValues));
             }
 
